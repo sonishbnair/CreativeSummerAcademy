@@ -16,9 +16,15 @@ scoring_service = ScoringService()
 
 
 @router.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request):
+async def login_page(request: Request, db: Session = Depends(get_db)):
     """Show login page"""
-    return templates.TemplateResponse("auth/login.html", {"request": request})
+    # Get all existing children for the dropdown
+    children = db.query(User).order_by(User.name).all()
+    
+    return templates.TemplateResponse("auth/login.html", {
+        "request": request,
+        "children": children
+    })
 
 
 @router.post("/login")

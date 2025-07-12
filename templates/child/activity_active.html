@@ -239,7 +239,26 @@ const form = document.querySelector('form');
 if (form) {
     form.addEventListener('submit', function() {
         const now = new Date();
+        const selectedDuration = {{ session.selected_duration }};
+        
+        // Validate startTime before calculation
+        if (isNaN(startTime.getTime()) || !startTimeRaw) {
+            console.error('Invalid start time for actual_duration calculation:', startTimeRaw);
+            // Use selected_duration as fallback
+            document.getElementById('actual-duration').value = selectedDuration;
+            return;
+        }
+        
         const elapsedMinutes = Math.floor((now - startTime) / (1000 * 60));
+        
+        // Ensure we have a valid number
+        if (isNaN(elapsedMinutes) || elapsedMinutes < 0) {
+            console.error('Invalid elapsed time calculation:', elapsedMinutes);
+            document.getElementById('actual-duration').value = selectedDuration;
+            return;
+        }
+        
+        console.log('Setting actual_duration to:', elapsedMinutes);
         document.getElementById('actual-duration').value = elapsedMinutes;
     });
 }

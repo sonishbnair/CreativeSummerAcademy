@@ -13,8 +13,16 @@
             <p>Start your space adventure!</p>
             <form method="POST" action="/auth/login">
                 <div class="form-group">
-                    <label for="child_name">Your Name:</label>
-                    <input type="text" id="child_name" name="username" class="form-control" required>
+                    <label for="child_name">Select Your Name:</label>
+                    <select id="child_name" name="username" class="form-control" required>
+                        <option value="">Choose your name...</option>
+                        {% for child in children %}
+                        <option value="{{ child.name }}">{{ child.name }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if not children %}
+                    <small class="text-muted">No children registered yet. <a href="/auth/setup">Set up accounts first</a></small>
+                    {% endif %}
                 </div>
                 <input type="hidden" name="password" value="child">
                 <input type="hidden" name="user_type" value="child">
@@ -44,4 +52,48 @@
         <a href="/auth/setup" class="btn btn-success">First Time? Set Up Account</a>
     </div>
 </div>
+
+<style>
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+select.form-control {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 8px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 40px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.text-muted {
+    color: #6c757d;
+    font-size: 0.875em;
+    margin-top: 5px;
+    display: block;
+}
+
+.text-muted a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.text-muted a:hover {
+    text-decoration: underline;
+}
+</style>
 {% endblock %} 

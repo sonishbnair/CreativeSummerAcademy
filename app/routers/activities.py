@@ -300,6 +300,12 @@ async def complete_activity(
     if not session or session.user_id != user_id:
         raise HTTPException(status_code=404, detail="Activity not found")
     
+    # Validate actual_duration
+    if actual_duration <= 0 or actual_duration > 180:  # Max 3 hours
+        logger.warning(f"Invalid actual_duration: {actual_duration} for session {session_id}")
+        # Use selected_duration as fallback
+        actual_duration = session.selected_duration
+    
     if not activity_service.complete_activity(db, session_id, actual_duration):
         raise HTTPException(status_code=400, detail="Cannot complete activity")
     

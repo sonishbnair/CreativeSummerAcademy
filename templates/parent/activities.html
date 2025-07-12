@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Activity Management - Sreya's Creative Summer Academy{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="admin-header">
+        <h2>🎯 Activity Management</h2>
+        <p>Manage all activities in the system</p>
+    </div>
+
+    {% if activities %}
+    <div class="activities-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Child</th>
+                    <th>Activity Title</th>
+                    <th>Category</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                    <th>Score</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in activities %}
+                <tr class="activity-row status-{{ activity.status }}">
+                    <td>{{ activity.id }}</td>
+                    <td>{{ activity.user.name if activity.user else 'Unknown' }}</td>
+                    <td>
+                        {% if activity.generated_activity and activity.generated_activity.title %}
+                            {{ activity.generated_activity.title }}
+                        {% else %}
+                            <em>No title</em>
+                        {% endif %}
+                    </td>
+                    <td>{{ activity.selected_category.replace('_', ' ').title() }}</td>
+                    <td>{{ activity.selected_duration }} min</td>
+                    <td>
+                        <span class="status-badge status-{{ activity.status }}">
+                            {{ activity.status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if activity.score is not none %}
+                            {{ activity.score }}/100
+                            {% if activity.scored_by %}
+                                <br><small>by {{ activity.scored_by.name }}</small>
+                            {% endif %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="date-time" data-utc="{{ activity.created_at.isoformat() }}Z"></span>
+                    </td>
+                    <td>
+                        <form method="POST" action="/admin/activities/{{ activity.id }}/delete" 
+                              style="display: inline;"
+                              onsubmit="return confirm('Are you sure you want to delete this activity? This action cannot be undone.')">
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                🗑️ Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="no-activities">
+        <p>No activities found in the system.</p>
+    </div>
+    {% endif %}
+
+    <div class="admin-actions">
+        <a href="/admin/reports" class="btn btn-secondary">📊 View Reports</a>
+        <a href="/admin/config" class="btn btn-secondary">⚙️ System Config</a>
+        <a href="/dashboard/parent" class="btn btn-primary">🏠 Back to Dashboard</a>
+    </div>
+</div>
+
+<style>
+.admin-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.admin-header h2 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.activities-table {
+    margin: 30px 0;
+    overflow-x: auto;
+}
+
+.activities-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.activities-table th,
+.activities-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.activities-table th {
+    background: var(--primary-color);
+    color: white;
+    font-weight: bold;
+}
+
+.activities-table tr:hover {
+    background: #f8f9fa;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-active {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-completed {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-scored {
+    background: #d4edda;
+    color: #155724;
+}
+
+.activity-row.status-active {
+    border-left: 4px solid #ffc107;
+}
+
+.activity-row.status-completed {
+    border-left: 4px solid #17a2b8;
+}
+
+.activity-row.status-scored {
+    border-left: 4px solid #28a745;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 0.8em;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.admin-actions {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.admin-actions .btn {
+    margin: 0 10px;
+}
+
+.no-activities {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-style: italic;
+}
+
+.date-time {
+    font-size: 0.9em;
+    color: #666;
+}
+
+@media (max-width: 768px) {
+    .activities-table {
+        font-size: 0.9em;
+    }
+    
+    .activities-table th,
+    .activities-table td {
+        padding: 8px 6px;
+    }
+    
+    .activities-table td:nth-child(3) {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+</style>
+
+<script>
+// Convert all UTC dates to local time
+document.addEventListener('DOMContentLoaded', function() {
+    const dateElements = document.querySelectorAll('.date-time');
+    dateElements.forEach(function(element) {
+        const utcString = element.getAttribute('data-utc');
+        if (utcString) {
+            const date = new Date(utcString);
+            if (!isNaN(date.getTime())) {
+                element.textContent = date.toLocaleString();
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 

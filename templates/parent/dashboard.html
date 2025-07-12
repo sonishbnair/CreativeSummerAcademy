@@ -55,7 +55,8 @@
             <div class="button-group">
                 <a href="/admin/config" class="btn btn-primary">⚙️ System Configuration</a>
                 <a href="/admin/reports" class="btn btn-secondary">📊 Progress Reports</a>
-                <a href="/scoring/pending" class="btn btn-warning">🎯 Summer Charger Points Pending</a>
+                <a href="/admin/activities" class="btn btn-warning">🎯 Activity Management</a>
+                <a href="/scoring/pending" class="btn btn-info">🎯 Summer Charger Points Pending</a>
                 <a href="/dashboard/rules/parent" class="btn btn-info">📖 View Rules</a>
             </div>
         </div>
@@ -134,7 +135,7 @@
 
 .button-group {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 10px;
     margin-top: 15px;
 }
