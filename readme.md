@@ -596,21 +596,6 @@ MAX_ACTIVITY_DURATION=30
 - [ ] Advanced AI personalization based on preferences
 - [ ] Parent-child collaboration activities
 
-## 🔒 Privacy & Safety
-
-- **No External Data Collection** - All data stays within your chosen hosting
-- **Child-Safe Design** - No external links, simple interface
-- **AI Content Filtering** - All generated activities reviewed for age-appropriateness
-- **Parental Oversight** - Full admin control over all activities and configurations
-- **Session Security** - Secure password-protected parent access
-
-## 📞 Support
-
-For questions, issues, or feature requests:
-- Create an issue in the GitHub repository
-- Check the documentation in `/docs` folder
-- Review troubleshooting guide in `/docs/troubleshooting.md`
-
 ---
 
 **Built with ❤️ for creative kids and their families**
