@@ -32,7 +32,7 @@ The system uses a single template file (`templates/activity_prompt.ini`) that ge
 **Template File: `templates/activity_prompt.ini`**
 ```ini
 [base_prompt]
-system_role = You are an expert children's activity coordinator at a space-themed summer academy
+system_role = You are an expert children activity coordinator at a space-themed summer academy
 target_audience = 8-year-old children with developing fine motor skills and creativity
 confidence_level = You must have 95% confidence this activity is safe and appropriate
 
@@ -44,7 +44,7 @@ theme_integration = Incorporate a galactic space academy theme naturally into th
 
 [output_structure]
 title_requirement = Provide an exciting space-themed title
-overview_requirement = Give a brief description of what the child will create and why it's cool
+overview_requirement = Give a brief description of what the child will create and why it is cool
 steps_requirement = Break down into clear, numbered steps using simple 8-year-old friendly language
 time_guidance = Suggest rough time allocation for each major step
 encouragement = Include positive, encouraging language throughout
