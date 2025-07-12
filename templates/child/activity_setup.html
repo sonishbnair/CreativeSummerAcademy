@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Activity Setup - Sreya's Galactic Academy{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 1100px; margin: 40px auto 20px auto;">
+    <h2>🌟 Let's Create Something Amazing with Minnal Ammu! 🌟</h2>
+    <p>Choose your adventure and let's make something incredible together!</p>
+    
+    <form method="POST" action="/activities/generate" id="activity-form">
+        <div class="activity-grid">
+            <!-- Duration and Category Selection (Combined) -->
+            <div class="card">
+                <h3>⏰ How long do you want to craft?</h3>
+                <div class="form-group">
+                    <label for="duration">Activity Duration:</label>
+                    <select id="duration" name="duration" class="form-control" required>
+                        <option value="">Select duration</option>
+                        {% for duration in duration_options %}
+                        <option value="{{ duration }}">{{ duration }} minutes</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <hr>
+                <h3 style="margin-top: 18px;">🎯 What type of activity do you want?</h3>
+                <div class="form-group">
+                    <label for="category">Activity Category:</label>
+                    <select id="category" name="category" class="form-control" required>
+                        <option value="">Select category</option>
+                        {% for category in categories %}
+                        <option value="{{ category }}">{{ category.replace('_', ' ').title() }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <!-- Materials Selection -->
+            <div class="card">
+                <h3>🎨 What materials do you want to use?</h3>
+                <p>Select between {{ min_materials }} and {{ max_materials }} materials:</p>
+                <p>Selected: <span id="material-count" style="color: red;">0</span> / <span id="min-materials">{{ min_materials }}</span>-<span id="max-materials">{{ max_materials }}</span></p>
+                <div class="materials-grid">
+                    {% for material in materials %}
+                    <div class="material-item">
+                        <input type="checkbox" id="material-{{ loop.index }}" name="materials" value="{{ material }}" class="material-checkbox">
+                        <label for="material-{{ loop.index }}">{{ material.replace('_', ' ').title() }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div id="materials-error" class="error-message"></div>
+            </div>
+            <!-- Learning Objectives -->
+            <div class="card">
+                <h3>🧠 What do you want to learn today?</h3>
+                <div class="objectives-grid">
+                    {% for objective in objectives %}
+                    <div class="objective-item">
+                        <input type="checkbox" id="objective-{{ loop.index }}" name="objectives" value="{{ objective }}" class="objective-checkbox">
+                        <label for="objective-{{ loop.index }}">{{ objective.replace('_', ' ').title() }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div id="objectives-error" class="error-message"></div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <div id="general-error" class="error-message" style="margin-bottom: 12px;"></div>
+            <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">🌟 Create My Adventure with Minnal Ammu! 🌟</button>
+            <div id="loading-animation" style="display:none; margin-top: 18px;">
+                <div class="spinner" style="display:inline-block; width:40px; height:40px; border:4px solid #ffe066; border-top:4px solid #6c63ff; border-radius:50%; animation:spin 1s linear infinite;"></div>
+                <div style="margin-top:10px; color:#6c63ff; font-weight:600;">Creating your adventure...</div>
+            </div>
+        </div>
+    </form>
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/dashboard/child" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
+
+<script>
+document.getElementById('activity-form').addEventListener('submit', function(e) {
+    var btn = document.getElementById('submit-btn');
+    var loading = document.getElementById('loading-animation');
+    var minMaterials = parseInt(document.getElementById('min-materials').textContent);
+    var maxMaterials = parseInt(document.getElementById('max-materials').textContent);
+    var checkedMaterials = document.querySelectorAll('input[name="materials"]:checked').length;
+    var duration = document.getElementById('duration').value;
+    var category = document.getElementById('category').value;
+    var checkedObjectives = document.querySelectorAll('input[name="objectives"]:checked').length;
+    var materialsError = document.getElementById('materials-error');
+    var objectivesError = document.getElementById('objectives-error');
+    var generalError = document.getElementById('general-error');
+    var hasError = false;
+
+    // Clear previous errors
+    materialsError.textContent = '';
+    objectivesError.textContent = '';
+    generalError.textContent = '';
+
+    // Validation
+    if (!duration || !category) {
+        generalError.textContent = 'Please select both activity duration and category.';
+        hasError = true;
+    }
+    if (checkedMaterials < minMaterials || checkedMaterials > maxMaterials) {
+        materialsError.textContent = 'Please select between ' + minMaterials + ' and ' + maxMaterials + ' materials.';
+        hasError = true;
+    }
+    if (checkedObjectives === 0) {
+        objectivesError.textContent = 'Please select at least one learning objective.';
+        hasError = true;
+    }
+    if (hasError) {
+        e.preventDefault();
+        return false;
+    }
+    // Only disable button and show spinner if validation passes
+    btn.disabled = true;
+    btn.style.opacity = 0.6;
+    loading.style.display = 'block';
+});
+</script>
+<style>
+.materials-grid, .objectives-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.material-item, .objective-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f9f9f9;
+}
+
+.material-item:hover, .objective-item:hover {
+    background: #e9e9e9;
+}
+
+.material-item input, .objective-item input {
+    margin-right: 8px;
+}
+
+.material-item label, .objective-item label {
+    cursor: pointer;
+    font-size: 14px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.error-message {
+    color: #d32f2f;
+    font-size: 1em;
+    margin-top: 8px;
+    font-weight: 600;
+}
+</style>
+{% endblock %} 

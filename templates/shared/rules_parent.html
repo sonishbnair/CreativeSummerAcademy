@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Parent Guide - Creative Summer Academy{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>🎯 Creative Summer Academy Parent Guide</h2>
+    <p>Everything you need to know about monitoring and supporting Sreya's space adventures:</p>
+    
+    <div class="rules-section">
+        <h3>📊 Scoring System:</h3>
+        <ul>
+            <li>Activities are scored <strong>0-100 Summer Charger Points</strong> based on effort, creativity, and completion</li>
+            <li>Maximum Summer Charger Points reduces by <strong>5</strong> for each 5-minute extension used</li>
+            <li>Scoring is only available after the child's selected duration is completed</li>
+            <li>Each parent requires a unique password for scoring access</li>
+        </ul>
+    </div>
+    
+    <div class="rules-section">
+        <h3>⏰ Daily Limits & Timing:</h3>
+        <ul>
+            <li>Configurable maximum activities per day (default: <strong>3 activities</strong>)</li>
+            <li>Configurable activity duration range (default: <strong>10-30 minutes</strong>)</li>
+            <li><strong>15-minute cooldown</strong> after using "regenerate activity" option</li>
+            <li>Maximum <strong>2 extensions</strong> per activity (5 minutes each)</li>
+        </ul>
+    </div>
+    
+    <div class="rules-section">
+        <h3>🛡️ Child Safety & Engagement:</h3>
+        <ul>
+            <li>All activities are <strong>AI-generated specifically for 8-year-old development level</strong></li>
+            <li>Activities use only <strong>pre-approved materials</strong> from your configuration</li>
+            <li>Built-in preparation reminders (gather materials, hydration, bathroom)</li>
+            <li>Session recovery ensures no lost progress from technical issues</li>
+            <li>No external links or unsafe content</li>
+        </ul>
+    </div>
+    
+    <div class="rules-section">
+        <h3>⚙️ Administrative Controls:</h3>
+        <ul>
+            <li>Configure available materials, learning objectives, and categories</li>
+            <li>Set daily limits and time restrictions</li>
+            <li>View comprehensive activity reports and progress tracking</li>
+            <li>Manage multiple parent accounts with unique access</li>
+            <li>Monitor real-time activity status</li>
+        </ul>
+    </div>
+    
+    <div class="rules-section">
+        <h3>🤖 AI Activity Generation:</h3>
+        <ul>
+            <li>Uses <strong>Anthropic's Claude AI</strong> for personalized, age-appropriate activities</li>
+            <li><strong>30-second retry system</strong> with kid-friendly waiting messages</li>
+            <li>One regeneration attempt per activity request to prevent endless cycling</li>
+            <li>Activities incorporate selected materials, objectives, and time constraints</li>
+            <li>Ensures uniqueness by avoiding recent activity patterns</li>
+        </ul>
+    </div>
+    
+    <div class="rules-section">
+        <h3>📈 Progress Tracking:</h3>
+        <ul>
+            <li>Daily activity completion tracking</li>
+            <li>Summer Charger Points accumulation and scoring history</li>
+            <li>Time spent on activities</li>
+            <li>Extension usage patterns</li>
+            <li>Learning objective progress</li>
+        </ul>
+    </div>
+    
+    <div class="rules-section">
+        <h3>🔧 Available Materials:</h3>
+        <ul>
+            <li>cardboard, scissors, aluminum_foil, markers, glue, string, beads, paint, paper, tape</li>
+            <li>All materials are safe for 8-year-old use</li>
+            <li>Configurable minimum and maximum material selection</li>
+        </ul>
+    </div>
+    
+    <div class="rules-section">
+        <h3>🎯 Learning Objectives:</h3>
+        <ul>
+            <li><strong>Engineering</strong> - Building and problem-solving skills</li>
+            <li><strong>Creativity</strong> - Imagination and artistic expression</li>
+            <li><strong>Following Directions</strong> - Reading comprehension and step-following</li>
+            <li><strong>Problem Solving</strong> - Critical thinking and troubleshooting</li>
+            <li><strong>Fine Motor Skills</strong> - Hand-eye coordination and dexterity</li>
+            <li><strong>Color Recognition</strong> - Visual learning and color theory</li>
+        </ul>
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/dashboard/parent" class="btn btn-primary">📊 Go to Parent Dashboard</a>
+        <a href="/auth/logout" class="btn btn-secondary">Logout</a>
+    </div>
+</div>
+
+<style>
+.rules-section {
+    background: #f8f9fa;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 10px;
+    border-left: 5px solid #28a745;
+}
+
+.rules-section h3 {
+    color: #28a745;
+    margin-bottom: 15px;
+}
+
+.rules-section ol, .rules-section ul {
+    margin-left: 20px;
+}
+
+.rules-section li {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.rules-section strong {
+    color: #007bff;
+}
+</style>
+{% endblock %} 

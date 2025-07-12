@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Active Activity - Sreya's Galactic Academy{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>🌟 Sreya's Adventure with Minnal Ammu 🌟</h2>
+    
+    <div class="activity-header">
+        <h3>{{ activity.title if activity and activity.title else 'Your Space Adventure' }}</h3>
+        <p class="activity-description">
+            {{ activity.description if activity and activity.description else 'Get ready for a fun and creative space-themed activity!' }}
+        </p>
+    </div>
+    
+    <div class="timer-section">
+        <div class="timer" id="timer" data-session-id="{{ session.id }}">
+            Loading...
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: 0%"></div>
+        </div>
+    </div>
+    
+    {% if activity and activity.steps %}
+    <div class="activity-steps">
+        <h4>🌟 Your Adventure Steps 🌟</h4>
+        <ol>
+            {% for step in activity.steps %}
+            <li>{{ step }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+    {% else %}
+    <div class="activity-steps">
+        <h4>🌟 Your Adventure Steps 🌟</h4>
+        <p>No steps found for this activity. Try refreshing or starting a new activity!</p>
+    </div>
+    {% endif %}
+    
+    <div class="activity-controls">
+        {% if can_extend %}
+        <button id="extend-button" class="btn btn-warning">
+            ⏰ Extend (+5 min) - {{ session.extensions_used }}/2 used
+        </button>
+        {% endif %}
+        
+        <form method="POST" action="/activities/{{ session.id }}/complete" style="display: inline;">
+            <input type="hidden" name="actual_duration" id="actual-duration" value="{{ session.selected_duration }}">
+            <button type="submit" class="btn btn-success">🎉 I'm Done!</button>
+        </form>
+    </div>
+    
+    <div id="timer-complete" style="display: none;" class="alert alert-warning">
+        <h3>⏰ Time's Up!</h3>
+        <p>Great job! You can extend your time or finish your activity.</p>
+    </div>
+    
+    <div class="encouragement">
+        <h4>💫 Minnal Ammu says:</h4>
+        <p>"You're doing amazing, Sreya! Keep creating and having fun!"</p>
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/dashboard/child" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
+
+<style>
+.activity-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.activity-description {
+    font-size: 1.2em;
+    color: #666;
+    margin: 15px 0;
+}
+
+.timer-section {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.timer {
+    font-size: 4em;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 20px 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.activity-steps {
+    background: #e8f4fd;
+    padding: 25px;
+    border-radius: 15px;
+    margin: 25px 0;
+}
+
+.activity-steps ol {
+    margin: 15px 0;
+    padding-left: 25px;
+}
+
+.activity-steps li {
+    margin: 12px 0;
+    line-height: 1.7;
+    font-size: 1.1em;
+}
+
+.activity-controls {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.encouragement {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 25px 0;
+    text-align: center;
+    border: 2px solid var(--secondary-color);
+}
+
+.encouragement h4 {
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+.encouragement p {
+    font-size: 1.2em;
+    color: var(--dark-color);
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .timer {
+        font-size: 3em;
+    }
+    
+    .activity-steps {
+        padding: 20px;
+    }
+}
+</style>
+
+<script>
+// Client-side timer calculation using database start_time
+const timerElem = document.getElementById('timer');
+const startTimeRaw = "{{ session.start_time.strftime('%Y-%m-%dT%H:%M:%SZ') if session.start_time else '' }}";
+const startTime = new Date(startTimeRaw);
+const duration = {{ session.selected_duration }} * 60; // Convert to seconds
+const extensions = {{ session.extensions_used }} * 5 * 60; // Extension time in seconds
+const totalTime = duration + extensions;
+
+let currentDuration = totalTime;
+let extensionsUsed = {{ session.extensions_used }};
+
+// Debug logging
+console.log('Timer Debug:', {
+    startTimeRaw: startTimeRaw,
+    startTime: startTime,
+    startTimeValid: !isNaN(startTime.getTime()),
+    duration: duration,
+    extensions: extensions,
+    totalTime: totalTime,
+    now: new Date()
+});
+
+function updateTimer() {
+    const now = new Date();
+    
+    // Check if startTime is valid
+    if (isNaN(startTime.getTime()) || !startTimeRaw) {
+        console.error('Invalid start time:', startTimeRaw);
+        // Show original duration as fallback
+        const fallbackMinutes = {{ session.selected_duration }};
+        timerElem.textContent = `${fallbackMinutes}:00`;
+        return;
+    }
+    
+    const elapsed = Math.floor((now - startTime) / 1000);
+    const remaining = Math.max(0, currentDuration - elapsed);
+    
+    // Debug logging
+    console.log('Timer Update:', {
+        now: now,
+        startTime: startTime,
+        elapsed: elapsed,
+        elapsedMinutes: Math.floor(elapsed / 60),
+        currentDuration: currentDuration,
+        remaining: remaining,
+        minutes: Math.floor(remaining / 60),
+        seconds: remaining % 60
+    });
+    
+    // Update timer display
+    const minutes = Math.floor(remaining / 60);
+    const seconds = remaining % 60;
+    timerElem.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    
+    // Update progress bar
+    const progress = Math.min(100, (elapsed / currentDuration) * 100);
+    document.querySelector('.progress-fill').style.width = `${progress}%`;
+    
+    if (remaining > 0) {
+        setTimeout(updateTimer, 1000);
+    } else {
+        document.getElementById('timer-complete').style.display = 'block';
+    }
+}
+
+// Start timer
+updateTimer();
+
+// Handle extend button
+const extendButton = document.getElementById('extend-button');
+if (extendButton) {
+    extendButton.addEventListener('click', () => {
+        fetch(`/activities/{{ session.id }}/extend`, {
+            method: 'POST'
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                currentDuration += 5 * 60; // Add 5 minutes
+                extensionsUsed = data.extensions_used;
+                extendButton.textContent = `Extend (+5 min) - ${extensionsUsed}/2 used`;
+                if (extensionsUsed >= 2) {
+                    extendButton.disabled = true;
+                }
+            }
+        });
+    });
+}
+
+// Update actual duration when form is submitted
+const form = document.querySelector('form');
+if (form) {
+    form.addEventListener('submit', function() {
+        const now = new Date();
+        const elapsedMinutes = Math.floor((now - startTime) / (1000 * 60));
+        document.getElementById('actual-duration').value = elapsedMinutes;
+    });
+}
+</script>
+{# Debug block for troubleshooting #}
+{% if activity %}
+<details style="margin-top: 2em;">
+  <summary>Show Raw Activity Data (for troubleshooting)</summary>
+  <pre>{{ activity | tojson(indent=2) }}</pre>
+</details>
+{% endif %}
+{% endblock %} 

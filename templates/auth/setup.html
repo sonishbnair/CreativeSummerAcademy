@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Setup Account - Creative Summer Academy{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>🌟 Welcome to Sreya's Creative Summer Academy! 🌟</h2>
+    <p>Join Minnal Ammu and set up your space adventure account:</p>
+    
+    <div class="activity-grid">
+        <!-- Parent Registration -->
+        <div class="card">
+            <h3>👨‍👩‍👧‍👦 Parent Registration</h3>
+            <p>Create a parent account to monitor and score activities</p>
+            
+            <form method="POST" action="/auth/setup" id="parent-form">
+                <input type="hidden" name="setup_type" value="parent">
+                
+                <div class="form-group">
+                    <label for="parent_name">Parent/Guardian Name:</label>
+                    <input type="text" id="parent_name" name="parent_name" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="parent_password">Password:</label>
+                    <input type="password" id="parent_password" name="parent_password" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="parent_confirm_password">Confirm Password:</label>
+                    <input type="password" id="parent_confirm_password" name="parent_confirm_password" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="child_selection">Child (Optional):</label>
+                    <select id="child_selection" name="child_id" class="form-control">
+                        <option value="">-- Select existing child or create new --</option>
+                        {% for child in existing_children %}
+                        <option value="{{ child.id }}">{{ child.name }}</option>
+                        {% endfor %}
+                        <option value="new">+ Create new child</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="new_child_group" style="display: none;">
+                    <label for="new_child_name">New Child's Name:</label>
+                    <input type="text" id="new_child_name" name="new_child_name" class="form-control">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Create Parent Account</button>
+            </form>
+        </div>
+        
+        <!-- Child Registration -->
+        <div class="card">
+            <h3>👶 Child Registration</h3>
+            <p>Create a child account to start space adventures</p>
+            
+            <form method="POST" action="/auth/setup" id="child-form">
+                <input type="hidden" name="setup_type" value="child">
+                
+                <div class="form-group">
+                    <label for="child_name">Child's Name:</label>
+                    <input type="text" id="child_name" name="child_name" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="parent_selection">Parent (Optional):</label>
+                    <select id="parent_selection" name="parent_id" class="form-control">
+                        <option value="">-- Select existing parent or create new --</option>
+                        {% for parent in existing_parents %}
+                        <option value="{{ parent.id }}">{{ parent.name }}</option>
+                        {% endfor %}
+                        <option value="new">+ Create new parent</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="new_parent_group" style="display: none;">
+                    <label for="new_parent_name">New Parent's Name:</label>
+                    <input type="text" id="new_parent_name" name="new_parent_name" class="form-control">
+                    
+                    <label for="new_parent_password">Parent Password:</label>
+                    <input type="password" id="new_parent_password" name="new_parent_password" class="form-control">
+                    
+                    <label for="new_parent_confirm_password">Confirm Password:</label>
+                    <input type="password" id="new_parent_confirm_password" name="new_parent_confirm_password" class="form-control">
+                </div>
+                
+                <button type="submit" class="btn btn-secondary">Create Child Account</button>
+            </form>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/auth/login" class="btn btn-secondary">Back to Login</a>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Parent form child selection
+    const childSelection = document.getElementById('child_selection');
+    const newChildGroup = document.getElementById('new_child_group');
+    const newChildName = document.getElementById('new_child_name');
+    
+    childSelection.addEventListener('change', function() {
+        if (this.value === 'new') {
+            newChildGroup.style.display = 'block';
+            newChildName.required = true;
+        } else {
+            newChildGroup.style.display = 'none';
+            newChildName.required = false;
+        }
+    });
+    
+    // Child form parent selection
+    const parentSelection = document.getElementById('parent_selection');
+    const newParentGroup = document.getElementById('new_parent_group');
+    const newParentName = document.getElementById('new_parent_name');
+    const newParentPassword = document.getElementById('new_parent_password');
+    const newParentConfirmPassword = document.getElementById('new_parent_confirm_password');
+    
+    parentSelection.addEventListener('change', function() {
+        if (this.value === 'new') {
+            newParentGroup.style.display = 'block';
+            newParentName.required = true;
+            newParentPassword.required = true;
+            newParentConfirmPassword.required = true;
+        } else {
+            newParentGroup.style.display = 'none';
+            newParentName.required = false;
+            newParentPassword.required = false;
+            newParentConfirmPassword.required = false;
+        }
+    });
+    
+    // Password confirmation validation
+    const parentForm = document.getElementById('parent-form');
+    const childForm = document.getElementById('child-form');
+    
+    parentForm.addEventListener('submit', function(e) {
+        const password = document.getElementById('parent_password').value;
+        const confirmPassword = document.getElementById('parent_confirm_password').value;
+        
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            alert('Passwords do not match!');
+            return false;
+        }
+    });
+    
+    childForm.addEventListener('submit', function(e) {
+        const password = document.getElementById('new_parent_password');
+        const confirmPassword = document.getElementById('new_parent_confirm_password');
+        
+        if (password && confirmPassword && password.value !== confirmPassword.value) {
+            e.preventDefault();
+            alert('Passwords do not match!');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %} 

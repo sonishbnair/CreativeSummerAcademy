@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Activity Details - Creative Summer Academy{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="activity-header">
+        <h2>🎨 {{ activity.title }}</h2>
+        {% if score is not none %}
+        <div class="score-display">
+            <div class="score-badge-large">
+                <span class="score-number">{{ score }}</span>
+                <span class="score-label">Summer Charger Points Earned</span>
+            </div>
+            {% if parent_name or scored_at %}
+            <div class="score-meta">
+                {% if parent_name %}
+                <span class="score-parent">Scored by: <strong>{{ parent_name }}</strong></span>
+                {% endif %}
+                {% if scored_at %}
+                <span>on <span class="score-date" data-utc="{{ scored_at.isoformat() }}Z"></span></span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="activity-info">
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>Category:</strong> {{ session.selected_category }}
+            </div>
+            <div class="info-item">
+                <strong>Duration:</strong> {{ session.selected_duration }} minutes
+            </div>
+            <div class="info-item">
+                <strong>Status:</strong> 
+                <span class="status-badge status-{{ session.status }}">
+                    {{ session.status }}
+                </span>
+            </div>
+            {% if session.actual_duration %}
+            <div class="info-item">
+                <strong>Actual Time:</strong> {{ session.actual_duration }} minutes
+            </div>
+            {% endif %}
+            {% if session.extensions_used %}
+            <div class="info-item">
+                <strong>Extensions Used:</strong> {{ session.extensions_used }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if activity.description %}
+    <div class="activity-section">
+        <h3>📝 What You'll Create</h3>
+        <p>{{ activity.description }}</p>
+    </div>
+    {% endif %}
+
+    {% if activity.steps %}
+    <div class="activity-section">
+        <h3>📋 Steps to Follow</h3>
+        <ol class="steps-list">
+            {% for step in activity.steps %}
+            <li>{{ step }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+    {% endif %}
+
+    {% if activity.materials %}
+    <div class="activity-section">
+        <h3>🛠️ Materials You'll Need</h3>
+        <ul class="materials-list">
+            {% for material in activity.materials %}
+            <li>{{ material }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if session.status == "active" %}
+    <div class="action-buttons">
+        <a href="/activities/{{ session.id }}/active" class="btn btn-primary">Continue Activity</a>
+    </div>
+    {% elif session.status == "completed" %}
+    <div class="action-buttons">
+        <p class="waiting-message">⏳ Waiting for parent to score your activity...</p>
+    </div>
+    {% elif session.status == "scored" %}
+    <div class="action-buttons">
+        <a href="/dashboard/child" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+    {% else %}
+    <div class="action-buttons">
+        <a href="/activities/{{ session.id }}/review" class="btn btn-primary">Start Activity</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Convert all UTC score dates to ET (America/New_York) time
+window.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.score-date[data-utc]').forEach(function(elem) {
+        var utcDate = new Date(elem.dataset.utc);
+        var options = {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+            timeZone: 'America/New_York',
+            timeZoneName: 'short'
+        };
+        elem.textContent = utcDate.toLocaleString(undefined, options);
+    });
+});
+</script>
+
+<style>
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.activity-header h2 {
+    margin: 0;
+    color: #495057;
+}
+
+.score-display {
+    text-align: center;
+}
+
+.score-badge-large {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 25px;
+    text-align: center;
+    min-width: 100px;
+}
+
+.score-badge-large .score-number {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.score-badge-large .score-label {
+    display: block;
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.activity-info {
+    margin-bottom: 30px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.info-item {
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+}
+
+.activity-section {
+    margin: 25px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.activity-section h3 {
+    color: #495057;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 5px;
+}
+
+.steps-list {
+    padding-left: 20px;
+}
+
+.steps-list li {
+    margin: 10px 0;
+    color: #6c757d;
+}
+
+.materials-list {
+    padding-left: 20px;
+}
+
+.materials-list li {
+    margin: 8px 0;
+    color: #6c757d;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status-completed {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-scored {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-active {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.action-buttons {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #e9ecef;
+}
+
+.waiting-message {
+    color: #856404;
+    background: #fff3cd;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ffeaa7;
+    font-weight: 500;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin: 0 10px;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+</style>
+{% endblock %} 

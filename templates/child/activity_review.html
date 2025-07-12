@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Review Activity - Sreya's Galactic Academy{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>🌟 Your Adventure with Minnal Ammu is Ready! 🌟</h2>
+    <!-- Summer Charger Points banner moved below -->
+    
+    <div class="activity-details">
+        <h3>{{ activity.title }}</h3>
+        <p class="activity-description">{{ activity.description }}</p>
+        
+        <div class="activity-info">
+            <div class="info-item">
+                <strong>⏰ Duration:</strong> {{ session.selected_duration }} minutes
+            </div>
+            <div class="info-item">
+                <strong>🎨 Category:</strong> {{ session.selected_category.replace('_', ' ').title() }}
+            </div>
+            <div class="info-item">
+                <strong>🧠 Learning:</strong> {{ session.selected_objectives|join(', ')|replace('_', ' ')|title }}
+            </div>
+        </div>
+        
+        {% if activity.steps %}
+        <div class="activity-steps">
+            <h4>🌟 Let's Get Started! 🌟</h4>
+            <ol>
+                {% for step in activity.steps %}
+                    {% if '(' in step and 'minute' in step %}
+                        <li>{{ step.split('(')[0].strip() }} <span style="color:#888; font-size:0.95em;">(Suggested time: {{ step.split('(')[1].replace(')', '') }})</span>{% if step.split(')')|length > 1 %} {{ step.split(')')[1] }}{% endif %}</li>
+                    {% else %}
+                        <li>{{ step }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ol>
+        </div>
+        {% endif %}
+        
+        {% if activity.safety_notes %}
+        <div class="safety-notes">
+            <h4>🛡️ Safety First!</h4>
+            <ul>
+                {% for note in activity.safety_notes %}
+                <li>{{ note }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="preparation-reminder">
+        <h3>🎯 Before You Start:</h3>
+        <ul>
+            <li>✅ Gather all your materials
+                <div style="margin: 8px 0 8px 18px;">
+                    <strong>Materials Needed:</strong>
+                    <ul style="margin-top:4px;">
+                        {% for mat in session.selected_materials %}
+                        <li style="list-style-type:circle; margin-left:18px;">{{ mat }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </li>
+            <li>✅ Drink some water</li>
+            <li>✅ Use the bathroom</li>
+            <li>✅ Find a comfortable workspace</li>
+        </ul>
+    </div>
+    
+    <!-- Summer Charger Points banner moved here -->
+    <div style="text-align:center; margin: 18px 0 28px 0;">
+        <span style="font-size:1.35em; font-weight:700; color:#ff9800; text-shadow: 1px 1px 8px #fffbe7; letter-spacing:1px;">
+            ⚡ Are you ready to get your “Summer Charger Points”? ⚡
+        </span>
+    </div>
+    
+    <div style="text-align: center; margin: 30px 0;">
+        <form method="POST" action="/activities/{{ session.id }}/start" style="display: inline;">
+            <button type="submit" class="btn btn-primary btn-lg">🚀 Start My Adventure with Minnal Ammu! 🚀</button>
+        </form>
+        
+        <a href="/activities/setup" class="btn btn-secondary">🔄 Create Different Activity</a>
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/dashboard/child" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
+
+<style>
+.activity-details {
+    margin: 20px 0;
+}
+
+.activity-description {
+    font-size: 1.1em;
+    color: #666;
+    margin: 15px 0;
+}
+
+.activity-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.info-item {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.activity-steps {
+    background: #e8f4fd;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.activity-steps ol {
+    margin: 15px 0;
+    padding-left: 20px;
+}
+
+.activity-steps li {
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+.safety-notes {
+    background: #fff3cd;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border-left: 4px solid var(--warning-color);
+}
+
+.safety-notes ul {
+    margin: 15px 0;
+    padding-left: 20px;
+}
+
+.preparation-reminder {
+    background: #d4edda;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border-left: 4px solid var(--success-color);
+}
+
+.preparation-reminder ul {
+    margin: 15px 0;
+    padding-left: 20px;
+}
+
+.preparation-reminder li {
+    margin: 8px 0;
+    font-size: 1.1em;
+}
+</style>
+{% endblock %} 

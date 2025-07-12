@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Rules for Kids - Creative Summer Academy{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>🌟 Welcome to Sreya's Creative Summer Academy! 🌟</h2>
+    <p>Join Minnal Ammu and learn how to become a Master Space Explorer!</p>
+    
+    <div class="rules-section">
+        <h3>🚀 How to Play:</h3>
+        <ol>
+            <li><strong>Pick Your Activity</strong> - Choose how long you want to craft, what materials to use, and what you want to learn!</li>
+            <li><strong>Get Ready</strong> - Gather all your materials, drink some water, and use the bathroom</li>
+            <li><strong>Start Crafting</strong> - Follow the steps and have fun creating!</li>
+            <li><strong>Finish Strong</strong> - Try to finish in the time you picked to get the most Summer Charger Points!</li>
+        </ol>
+    </div>
+    
+    <div class="rules-section">
+        <h3>📋 Important Rules:</h3>
+        <ul>
+            <li>You can only do <strong>3 activities each day</strong></li>
+            <li>If you need more time, you can add 5 more minutes (but you'll get fewer Summer Charger Points)</li>
+            <li>You can only ask for extra time <strong>2 times per activity</strong></li>
+            <li>Wait for a grown-up to give you Summer Charger Points before starting your next activity</li>
+            <li>If you close your computer, don't worry! Come back and keep going where you left off</li>
+        </ul>
+    </div>
+    
+    <div class="rules-section">
+        <h3>🏆 Summer Charger Points System:</h3>
+        <ul>
+            <li>Each activity can give you up to <strong>100 Summer Charger Points</strong></li>
+            <li>If you use extra time once: <strong>95 Summer Charger Points maximum</strong></li>
+            <li>If you use extra time twice: <strong>90 Summer Charger Points maximum</strong></li>
+            <li>Collect Summer Charger Points to become a <strong>Master Space Explorer</strong>!</li>
+        </ul>
+    </div>
+    
+    <div class="rules-section">
+        <h3>🎨 Activity Categories:</h3>
+        <ul>
+            <li><strong>Art Lab</strong> - Drawing and painting activities</li>
+            <li><strong>Engineering Bay</strong> - Building and construction projects</li>
+            <li><strong>Cosmic Jewelry Workshop</strong> - Jewelry making and beading</li>
+            <li><strong>Creative Station</strong> - Mixed media and experimental crafts</li>
+        </ul>
+    </div>
+    
+    <div class="rules-section">
+        <h3>💡 Learning Objectives:</h3>
+        <ul>
+            <li><strong>Engineering</strong> - Building and problem-solving</li>
+            <li><strong>Creativity</strong> - Using your imagination</li>
+            <li><strong>Following Directions</strong> - Reading and following steps</li>
+            <li><strong>Problem Solving</strong> - Figuring things out</li>
+            <li><strong>Fine Motor Skills</strong> - Using your hands carefully</li>
+            <li><strong>Color Recognition</strong> - Learning about colors</li>
+        </ul>
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/dashboard/child" class="btn btn-primary">🚀 Start Your Adventure!</a>
+        <a href="/auth/logout" class="btn btn-secondary">Logout</a>
+    </div>
+</div>
+
+<style>
+.rules-section {
+    background: #f8f9fa;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 10px;
+    border-left: 5px solid #007bff;
+}
+
+.rules-section h3 {
+    color: #007bff;
+    margin-bottom: 15px;
+}
+
+.rules-section ol, .rules-section ul {
+    margin-left: 20px;
+}
+
+.rules-section li {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.rules-section strong {
+    color: #28a745;
+}
+</style>
+{% endblock %} 

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Creative Summer Academy{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>🌟 Welcome to Sreya's Creative Summer Academy! 🌟</h2>
+    <p>Join Minnal Ammu and start your amazing space adventure!</p>
+    
+    <div class="activity-grid">
+        <div class="card">
+            <h3>👶 Child Login</h3>
+            <p>Start your space adventure!</p>
+            <form method="POST" action="/auth/login">
+                <div class="form-group">
+                    <label for="child_name">Your Name:</label>
+                    <input type="text" id="child_name" name="username" class="form-control" required>
+                </div>
+                <input type="hidden" name="password" value="child">
+                <input type="hidden" name="user_type" value="child">
+                <button type="submit" class="btn btn-primary">Start Adventure!</button>
+            </form>
+        </div>
+        
+        <div class="card">
+            <h3>👨‍👩‍👧‍👦 Parent Login</h3>
+            <p>Monitor progress and score activities</p>
+            <form method="POST" action="/auth/login">
+                <div class="form-group">
+                    <label for="parent_name">Parent Name:</label>
+                    <input type="text" id="parent_name" name="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="parent_password">Password:</label>
+                    <input type="password" id="parent_password" name="password" class="form-control" required>
+                </div>
+                <input type="hidden" name="user_type" value="parent">
+                <button type="submit" class="btn btn-secondary">Parent Access</button>
+            </form>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/auth/setup" class="btn btn-success">First Time? Set Up Account</a>
+    </div>
+</div>
+{% endblock %} 

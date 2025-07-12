@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Activity Locked!{% endblock %}
+
+{% block content %}
+<div class="card" style="text-align: center; margin-top: 40px;">
+    <h2>🚦 Whoa, Space Explorer!</h2>
+    <p>
+        You can't start a new activity right now.<br>
+        {% if session and session.status in ['active', 'completed'] %}
+            <strong>Reason:</strong> You already have an activity in progress or waiting for a grown-up to score it.<br>
+            <span style="color: #007bff;">Please finish your current activity or ask a parent to score it before starting a new one!</span>
+        {% else %}
+            <strong>Reason:</strong> You've reached your maximum number of activities for today.<br>
+            <span style="color: #007bff;">Come back tomorrow for more galactic adventures!</span>
+        {% endif %}
+    </p>
+    <div style="margin: 20px 0;">
+        <strong>Today's Activity Count:</strong><br>
+        <span style="font-size: 1.3em; color: #28a745;">
+            {{ today_stats.activities_completed if today_stats else '?' }} / {{ max_activities_per_day if max_activities_per_day else '?' }}
+        </span>
+    </div>
+    <a href="/dashboard/child" class="btn btn-primary" style="margin-top: 20px;">Back to Dashboard</a>
+</div>
+{% endblock %} 

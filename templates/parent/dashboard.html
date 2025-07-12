@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Parent Dashboard - Creative Summer Academy{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>🌟 Welcome to Sreya's Creative Summer Academy - Parent Control Center! 🌟</h2>
+    <p>Monitor Sreya's space adventures and manage her activities:</p>
+    
+    <div class="activity-grid">
+        <!-- Activity Monitoring -->
+        <div class="card">
+            <h3>📊 Activity Monitoring</h3>
+            <p>Track Sreya's progress and current activities</p>
+            
+            {% if pending_activities %}
+            <div class="alert alert-info">
+                <h4>🎯 Activities Pending Scoring</h4>
+                {% for activity in pending_activities %}
+                <div class="activity-item">
+                    <strong>{{ activity.generated_activity.title }}</strong><br>
+                    <small>Started: {{ activity.start_time.strftime('%H:%M') if activity.start_time else 'N/A' }} | Duration: {{ activity.selected_duration }} min</small>
+                    <a href="/scoring/{{ activity.id }}" class="btn btn-primary btn-sm">Summer Charger Points Scoring</a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-success">
+                <h4>✅ No Activities Pending</h4>
+                <p>All activities have been Summer Charger Points scored!</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Children Management -->
+        <div class="card">
+            <h3>👶 Children Accounts</h3>
+            {% if children %}
+            <div class="children-list">
+                {% for child in children %}
+                <div class="child-item">
+                    <strong>{{ child.name }}</strong>
+                    <small>ID: {{ child.id }} | Created: {{ child.created_at.strftime('%Y-%m-%d') }}</small>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>No children registered yet.</p>
+            {% endif %}
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card">
+            <h3>⚡ Quick Actions</h3>
+            <div class="button-group">
+                <a href="/admin/config" class="btn btn-primary">⚙️ System Configuration</a>
+                <a href="/admin/reports" class="btn btn-secondary">📊 Progress Reports</a>
+                <a href="/scoring/pending" class="btn btn-warning">🎯 Summer Charger Points Pending</a>
+                <a href="/dashboard/rules/parent" class="btn btn-info">📖 View Rules</a>
+            </div>
+        </div>
+        
+        <!-- System Configuration -->
+        <div class="card">
+            <h3>🔧 System Configuration</h3>
+            {% if config %}
+            <div class="status-grid">
+                <div class="status-item">
+                    <span class="status-label">Daily Limit:</span>
+                    <span class="status-value">{{ config.activity_limits.max_activities_per_day }} activities</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Time Range:</span>
+                    <span class="status-value">{{ config.activity_limits.min_activity_duration }}-{{ config.activity_limits.max_activity_duration }} min</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Extension Penalty:</span>
+                    <span class="status-value">{{ config.scoring.extension_penalty }} Summer Charger Points</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Available Materials:</span>
+                    <span class="status-value">{{ config.materials.available_items|length }} items</span>
+                </div>
+            </div>
+            {% else %}
+            <p>Configuration not loaded.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="/auth/logout" class="btn btn-secondary">Logout</a>
+    </div>
+</div>
+
+<style>
+.activity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.activity-item {
+    background: #f8f9fa;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+}
+
+.child-item {
+    background: #f8f9fa;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border-left: 4px solid #28a745;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.button-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.alert {
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 8px;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.children-list {
+    margin-top: 15px;
+}
+</style>
+{% endblock %} 

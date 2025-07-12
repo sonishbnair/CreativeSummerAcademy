@@ -1,0 +1,140 @@
+{# Burger Menu Partial - include in base.html except login #}
+{% set is_child = request.session.get('user_type') == 'child' %}
+{% set is_parent = request.session.get('user_type') == 'parent' %}
+
+<!-- Burger Button -->
+<div id="burger-btn" onclick="openBurgerMenu()">
+  <span></span><span></span><span></span>
+</div>
+
+<!-- Slide-out Menu -->
+<div id="burger-menu" class="burger-menu">
+  <div class="burger-header">
+    <span style="font-size:1.3em; font-weight:700; color:#fff;">☀️ Menu</span>
+    <button onclick="closeBurgerMenu()" class="close-btn">&times;</button>
+  </div>
+  <ul class="burger-list">
+    {% if is_child %}
+      <li><a href="/dashboard/child" onclick="closeBurgerMenu()">🏠 Home</a></li>
+      <li><a href="/activities/setup" onclick="closeBurgerMenu()">🚀 Start New Activity</a></li>
+      <li><a href="/dashboard/rules/child" onclick="closeBurgerMenu()">📜 Rules</a></li>
+      {% if active_session %}
+        <li><a href="/activities/{{ active_session.id }}/active" onclick="closeBurgerMenu()">⏳ Resume Active Activity</a></li>
+        <li><a href="/activities/{{ active_session.id }}/review" onclick="closeBurgerMenu()">👀 Review Current Activity</a></li>
+      {% endif %}
+      <li><a href="/auth/logout" onclick="closeBurgerMenu()">🚪 Logout</a></li>
+    {% elif is_parent %}
+      <li><a href="/dashboard/parent" onclick="closeBurgerMenu()">🏠 Home</a></li>
+      <li><a href="/dashboard/rules/parent" onclick="closeBurgerMenu()">📜 Rules</a></li>
+      <li><a href="/scoring/pending" onclick="closeBurgerMenu()">📝 Pending Activities</a></li>
+      <li><a href="/admin/config" onclick="closeBurgerMenu()">⚙️ System Configuration</a></li>
+      <li><a href="/admin/reports" onclick="closeBurgerMenu()">📊 Progress Reports</a></li>
+      <li><a href="/auth/logout" onclick="closeBurgerMenu()">🚪 Logout</a></li>
+    {% endif %}
+  </ul>
+</div>
+
+<style>
+#burger-btn {
+  position: fixed;
+  top: 22px;
+  right: 22px;
+  width: 44px;
+  height: 44px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  cursor: pointer;
+  background: #fff;
+  border: 2px solid #6c63ff;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px #0002;
+  transition: box-shadow 0.2s;
+}
+#burger-btn:hover {
+  box-shadow: 0 4px 20px #6c63ff44;
+  border-color: #a084ee;
+}
+#burger-btn span {
+  display: block;
+  height: 5px;
+  width: 70%;
+  margin: 0 auto;
+  background: #6c63ff;
+  border-radius: 3px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  transition: 0.3s;
+}
+.burger-menu {
+  position: fixed;
+  top: 0; right: -320px;
+  width: 300px;
+  height: 100vh;
+  background: linear-gradient(135deg, #6c63ff 60%, #a084ee 100%);
+  color: #fff;
+  z-index: 1200;
+  box-shadow: -2px 0 16px #0002;
+  transition: right 0.35s cubic-bezier(.77,0,.18,1);
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+}
+.burger-menu.open {
+  right: 0;
+}
+.burger-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 22px 10px 22px;
+  border-bottom: 1px solid #fff3;
+}
+.close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2em;
+  cursor: pointer;
+  margin-left: 10px;
+}
+.burger-list {
+  list-style: none;
+  padding: 0 0 0 0;
+  margin: 0;
+  flex: 1;
+}
+.burger-list li {
+  margin: 0;
+  border-bottom: 1px solid #fff2;
+}
+.burger-list a {
+  display: block;
+  padding: 18px 32px;
+  color: #fff;
+  font-size: 1.13em;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+}
+.burger-list a:hover {
+  background: #fff2;
+  color: #ffe066;
+}
+@media (max-width: 600px) {
+  .burger-menu { width: 90vw; }
+}
+</style>
+<script>
+function openBurgerMenu() {
+  document.getElementById('burger-menu').classList.add('open');
+}
+function closeBurgerMenu() {
+  document.getElementById('burger-menu').classList.remove('open');
+}
+// Optional: close menu on ESC
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeBurgerMenu();
+});
+</script> 
