@@ -3,6 +3,20 @@
 {% block title %}Parent Dashboard - Creative Summer Academy{% endblock %}
 
 {% block content %}
+<!-- User Banner -->
+<div class="user-banner">
+    <div class="user-info">
+        <span class="user-icon">👤</span>
+        <span class="user-name">{{ current_parent.name }}</span>
+        {% if current_parent.name == "admin" %}
+        <span class="admin-badge">👑 Admin</span>
+        {% endif %}
+    </div>
+    <div class="user-actions">
+        <a href="/auth/logout" class="btn btn-sm btn-outline">Logout</a>
+    </div>
+</div>
+
 <div class="card">
     <h2>🌟 Welcome to Sreya's Creative Summer Academy - Parent Control Center! 🌟</h2>
     <p>Monitor Sreya's space adventures and manage her activities:</p>
@@ -56,6 +70,9 @@
                 <a href="/admin/config" class="btn btn-primary">⚙️ System Configuration</a>
                 <a href="/admin/reports" class="btn btn-secondary">📊 Progress Reports</a>
                 <a href="/admin/activities" class="btn btn-warning">🎯 Activity Management</a>
+                {% if current_parent and current_parent.name == "admin" %}
+                <a href="/admin/users" class="btn btn-danger">👥 User Management</a>
+                {% endif %}
                 <a href="/scoring/pending" class="btn btn-info">🎯 Summer Charger Points Pending</a>
                 <a href="/dashboard/rules/parent" class="btn btn-info">📖 View Rules</a>
             </div>
@@ -89,9 +106,17 @@
         </div>
     </div>
     
-    <div style="text-align: center; margin-top: 30px;">
-        <a href="/auth/logout" class="btn btn-secondary">Logout</a>
-    </div>
+    <!-- Debug info (remove this after testing) -->
+    {% if current_parent %}
+    <details style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+        <summary>🔍 Debug Info (Admin Check)</summary>
+        <p><strong>Current Parent:</strong> {{ current_parent.name }}</p>
+        <p><strong>Parent ID:</strong> {{ current_parent.id }}</p>
+        <p><strong>Is Admin:</strong> {% if current_parent.name == "admin" %}✅ Yes{% else %}❌ No{% endif %}</p>
+        <p><strong>Session User ID:</strong> {{ request.session.get("user_id") }}</p>
+        <p><strong>Session User Type:</strong> {{ request.session.get("user_type") }}</p>
+    </details>
+    {% endif %}
 </div>
 
 <style>
@@ -160,6 +185,79 @@
 
 .children-list {
     margin-top: 15px;
+}
+
+.user-banner {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
+    color: white;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-icon {
+    font-size: 1.2em;
+}
+
+.user-name {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.admin-badge {
+    background: #ffc107;
+    color: #856404;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.user-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.875em;
+}
+
+.btn-outline {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+    background: white;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+@media (max-width: 768px) {
+    .user-banner {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .user-info {
+        justify-content: center;
+    }
 }
 </style>
 {% endblock %} 

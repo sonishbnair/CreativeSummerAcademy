@@ -7,6 +7,12 @@
     <h2>🌟 Welcome to Sreya's Creative Summer Academy! 🌟</h2>
     <p>Join Minnal Ammu and start your amazing space adventure!</p>
     
+    {% if error %}
+    <div class="alert alert-danger">
+        <strong>⚠️ Login Error:</strong> {{ error }}
+    </div>
+    {% endif %}
+    
     <div class="activity-grid">
         <div class="card">
             <h3>👶 Child Login</h3>
@@ -94,6 +100,23 @@ select.form-control {
 
 .text-muted a:hover {
     text-decoration: underline;
+}
+
+.alert {
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 8px;
+    border: 1px solid;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert strong {
+    font-weight: bold;
 }
 </style>
 {% endblock %} 

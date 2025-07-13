@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - Sreya's Creative Summer Academy{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="admin-header">
+        <h2>👥 User Management</h2>
+        <p>Manage children and parent accounts</p>
+    </div>
+
+    <div class="management-grid">
+        <!-- Children Management -->
+        <div class="management-section">
+            <h3>👶 Children</h3>
+            
+            <!-- Add Child Form -->
+            <div class="add-form">
+                <h4>Add New Child</h4>
+                <form method="POST" action="/admin/users/child/add">
+                    <div class="form-group">
+                        <label for="child_name">Child Name:</label>
+                        <input type="text" id="child_name" name="child_name" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">➕ Add Child</button>
+                </form>
+            </div>
+
+            <!-- Children List -->
+            <div class="users-list">
+                <h4>Existing Children ({{ children|length }})</h4>
+                {% if children %}
+                <div class="users-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for child in children %}
+                            <tr>
+                                <td>{{ child.id }}</td>
+                                <td>{{ child.name }}</td>
+                                <td>
+                                    <span class="date-time" data-utc="{{ child.created_at.isoformat() }}Z"></span>
+                                </td>
+                                <td>
+                                    <form method="POST" action="/admin/users/child/{{ child.id }}/delete" 
+                                          style="display: inline;"
+                                          onsubmit="return confirm('Are you sure you want to delete {{ child.name }}? This will also delete all their activities and data.')">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            🗑️ Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="no-users">No children registered yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Parents Management -->
+        <div class="management-section">
+            <h3>👨‍👩‍👧‍👦 Parents</h3>
+            
+            <!-- Add Parent Form -->
+            <div class="add-form">
+                <h4>Add New Parent</h4>
+                <form method="POST" action="/admin/users/parent/add">
+                    <div class="form-group">
+                        <label for="parent_name">Parent Name:</label>
+                        <input type="text" id="parent_name" name="parent_name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="parent_password">Password:</label>
+                        <input type="password" id="parent_password" name="parent_password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">➕ Add Parent</button>
+                </form>
+            </div>
+
+            <!-- Parents List -->
+            <div class="users-list">
+                <h4>Existing Parents ({{ parents|length }})</h4>
+                {% if parents %}
+                <div class="users-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for parent in parents %}
+                            <tr class="{% if parent.name == 'admin' %}admin-row{% endif %}">
+                                <td>{{ parent.id }}</td>
+                                <td>
+                                    {{ parent.name }}
+                                    {% if parent.name == 'admin' %}
+                                    <span class="admin-badge">👑 Admin</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="date-time" data-utc="{{ parent.created_at.isoformat() }}Z"></span>
+                                </td>
+                                <td>
+                                    {% if parent.name != 'admin' %}
+                                    <form method="POST" action="/admin/users/parent/{{ parent.id }}/delete" 
+                                          style="display: inline;"
+                                          onsubmit="return confirm('Are you sure you want to delete {{ parent.name }}? This will also delete all their scores.')">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            🗑️ Delete
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <span class="text-muted">Cannot delete admin</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="no-users">No parents registered yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-actions">
+        <a href="/admin/activities" class="btn btn-secondary">🎯 Activity Management</a>
+        <a href="/admin/reports" class="btn btn-secondary">📊 Reports</a>
+        <a href="/admin/config" class="btn btn-secondary">⚙️ System Config</a>
+        <a href="/dashboard/parent" class="btn btn-primary">🏠 Back to Dashboard</a>
+    </div>
+</div>
+
+<style>
+.admin-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.admin-header h2 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.management-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.management-section {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 15px;
+    border: 2px solid #e9ecef;
+}
+
+.management-section h3 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.add-form {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border: 1px solid #dee2e6;
+}
+
+.add-form h4 {
+    margin-bottom: 15px;
+    color: var(--dark-color);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--dark-color);
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.users-list h4 {
+    margin-bottom: 15px;
+    color: var(--dark-color);
+}
+
+.users-table {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.users-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.users-table th,
+.users-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.users-table th {
+    background: var(--primary-color);
+    color: white;
+    font-weight: bold;
+}
+
+.users-table tr:hover {
+    background: #f8f9fa;
+}
+
+.admin-row {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+}
+
+.admin-badge {
+    background: #ffc107;
+    color: #856404;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.7em;
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 0.8em;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+    border: none;
+}
+
+.btn-success:hover {
+    background: #218838;
+}
+
+.admin-actions {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.admin-actions .btn {
+    margin: 0 10px;
+}
+
+.no-users {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-style: italic;
+    background: white;
+    border-radius: 8px;
+}
+
+.date-time {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.text-muted {
+    color: #6c757d;
+    font-size: 0.875em;
+}
+
+@media (max-width: 768px) {
+    .management-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .users-table {
+        font-size: 0.9em;
+    }
+    
+    .users-table th,
+    .users-table td {
+        padding: 8px 6px;
+    }
+}
+</style>
+
+<script>
+// Convert all UTC dates to local time
+document.addEventListener('DOMContentLoaded', function() {
+    const dateElements = document.querySelectorAll('.date-time');
+    dateElements.forEach(function(element) {
+        const utcString = element.getAttribute('data-utc');
+        if (utcString) {
+            const date = new Date(utcString);
+            if (!isNaN(date.getTime())) {
+                element.textContent = date.toLocaleString();
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 

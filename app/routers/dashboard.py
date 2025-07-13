@@ -95,11 +95,16 @@ async def parent_dashboard(request: Request, db: Session = Depends(get_db)):
     # Get system configuration
     config = config_service.get_full_config(db)
     
+    # Get current parent for admin check
+    from app.models.parent import Parent
+    current_parent = db.query(Parent).filter(Parent.id == user_id).first()
+    
     return templates.TemplateResponse("parent/dashboard.html", {
         "request": request,
         "children": children,
         "pending_activities": pending_activities,
-        "config": config
+        "config": config,
+        "current_parent": current_parent
     })
 
 

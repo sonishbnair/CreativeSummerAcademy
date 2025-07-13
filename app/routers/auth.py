@@ -21,9 +21,13 @@ async def login_page(request: Request, db: Session = Depends(get_db)):
     # Get all existing children for the dropdown
     children = db.query(User).order_by(User.name).all()
     
+    # Get error message from query parameter if any
+    error = request.query_params.get("error", "")
+    
     return templates.TemplateResponse("auth/login.html", {
         "request": request,
-        "children": children
+        "children": children,
+        "error": error
     })
 
 
@@ -54,17 +58,17 @@ async def login(
         # Parent login with password verification
         parent = db.query(Parent).filter(Parent.name == username).first()
         if not parent:
-            raise HTTPException(status_code=401, detail="Invalid credentials")
+            return RedirectResponse(url="/auth/login?error=Invalid+parent+name+or+password", status_code=302)
         
         if not scoring_service.verify_parent_password(db, parent.id, password):
-            raise HTTPException(status_code=401, detail="Invalid credentials")
+            return RedirectResponse(url="/auth/login?error=Invalid+parent+name+or+password", status_code=302)
         
         # Set session
         request.session["user_id"] = parent.id
         request.session["user_type"] = "parent"
         return RedirectResponse(url="/dashboard/parent", status_code=302)
     
-    raise HTTPException(status_code=400, detail="Invalid user type")
+    return RedirectResponse(url="/auth/login?error=Invalid+user+type", status_code=302)
 
 
 @router.get("/logout")
