@@ -7,6 +7,7 @@ from app.models.parent import Parent
 from app.config import settings
 from datetime import datetime, date
 import bcrypt
+from sqlalchemy import func
 
 
 class ScoringService:
@@ -162,4 +163,54 @@ class ScoringService:
             ActivitySession.user_id == user_id,
             ActivitySession.status.in_(["active", "completed"])
         ).first()
-        return unscored is None 
+        return unscored is None
+    
+    def recalculate_daily_stats(self, db: Session, user_id: int, target_date: date = None):
+        """Recalculate daily statistics for a user based on actual scored activities"""
+        if target_date is None:
+            target_date = date.today()
+        
+        # Get all scored activities for this user on this date
+        scored_activities = db.query(ActivitySession).join(ActivityScore).filter(
+            ActivitySession.user_id == user_id,
+            ActivitySession.status == "scored",
+            func.date(ActivitySession.created_at) == target_date
+        ).all()
+        
+        # Calculate totals
+        total_points = 0
+        total_time = 0
+        activities_count = len(scored_activities)
+        
+        for activity in scored_activities:
+            score_record = db.query(ActivityScore).filter(ActivityScore.session_id == activity.id).first()
+            if score_record:
+                total_points += score_record.score
+                total_time += activity.actual_duration or 0
+        
+        # Update or create daily stats
+        stats = db.query(DailyStats).filter(
+            DailyStats.user_id == user_id,
+            DailyStats.date == target_date
+        ).first()
+        
+        if stats:
+            stats.activities_completed = activities_count
+            stats.total_points = total_points
+            stats.total_time_minutes = total_time
+        else:
+            stats = DailyStats(
+                user_id=user_id,
+                date=target_date,
+                activities_completed=activities_count,
+                total_points=total_points,
+                total_time_minutes=total_time
+            )
+            db.add(stats)
+        
+        db.commit()
+        return {
+            "activities_completed": activities_count,
+            "total_points": total_points,
+            "total_time_minutes": total_time
+        } 

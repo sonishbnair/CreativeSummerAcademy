@@ -11,7 +11,7 @@ from datetime import date
 import logging
 
 # Set up logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('app.routers.admin')
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -33,6 +33,7 @@ async def admin_config(request: Request, db: Session = Depends(get_db)):
     from app.models.parent import Parent
     current_parent = db.query(Parent).filter(Parent.id == user_id).first()
     
+    logger.info(f"Admin {user_id} accessed config page")
     return templates.TemplateResponse("parent/config.html", {
         "request": request,
         "config": config,
@@ -92,6 +93,7 @@ async def admin_reports(request: Request, db: Session = Depends(get_db)):
     # Get current parent for user banner
     current_parent = db.query(Parent).filter(Parent.id == user_id).first()
     
+    logger.info(f"Admin {user_id} accessed reports page")
     return templates.TemplateResponse("parent/reports.html", {
         "request": request,
         "user_stats": user_stats,
@@ -140,6 +142,7 @@ async def admin_activities(request: Request, db: Session = Depends(get_db)):
     from app.models.parent import Parent
     current_parent = db.query(Parent).filter(Parent.id == user_id).first()
     
+    logger.info(f"Admin {user_id} accessed activity management page")
     return templates.TemplateResponse("parent/activities.html", {
         "request": request,
         "activities": activities,
@@ -162,11 +165,16 @@ async def delete_activity(
     
     from app.models.activity import ActivitySession
     from app.models.scoring import ActivityScore
+    from app.services.scoring_service import ScoringService
     
     # Get the activity
     activity = db.query(ActivitySession).filter(ActivitySession.id == activity_id).first()
     if not activity:
         raise HTTPException(status_code=404, detail="Activity not found")
+    
+    # Store user_id and activity date for recalculation
+    activity_user_id = activity.user_id
+    activity_date = activity.created_at.date() if activity.created_at else None
     
     try:
         # Delete related scores first (due to foreign key constraint)
@@ -176,6 +184,12 @@ async def delete_activity(
         db.delete(activity)
         db.commit()
         
+        # Recalculate daily stats for the user if activity was scored
+        if activity.status == "scored" and activity_date:
+            scoring_service = ScoringService()
+            scoring_service.recalculate_daily_stats(db, activity_user_id, activity_date)
+            logger.info(f"Recalculated daily stats for user {activity_user_id} after deleting activity {activity_id}")
+        
         logger.info(f"Activity {activity_id} deleted by parent {user_id}")
         
         return RedirectResponse(url="/admin/activities", status_code=302)
@@ -184,6 +198,47 @@ async def delete_activity(
         logger.error(f"Error deleting activity {activity_id}: {str(e)}")
         db.rollback()
         raise HTTPException(status_code=500, detail="Failed to delete activity")
+
+
+@router.post("/recalculate-stats/{user_id}")
+async def recalculate_user_stats(
+    request: Request,
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    """Manually recalculate daily stats for a user"""
+    admin_user_id = request.session.get("user_id")
+    user_type = request.session.get("user_type")
+    
+    if not admin_user_id or user_type != "parent":
+        return RedirectResponse(url="/auth/login", status_code=302)
+    
+    # Check admin privileges
+    from app.models.parent import Parent
+    admin_parent = db.query(Parent).filter(Parent.id == admin_user_id).first()
+    if not admin_parent or admin_parent.name != "admin":
+        raise HTTPException(status_code=403, detail="Access denied. Admin privileges required.")
+    
+    # Check if user exists
+    from app.models.user import User
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    try:
+        from app.services.scoring_service import ScoringService
+        scoring_service = ScoringService()
+        
+        # Recalculate stats for today
+        today_stats = scoring_service.recalculate_daily_stats(db, user_id)
+        
+        logger.info(f"Recalculated daily stats for user {user_id} (name: {user.name}): {today_stats}")
+        
+        return RedirectResponse(url="/admin/activities", status_code=302)
+        
+    except Exception as e:
+        logger.error(f"Error recalculating stats for user {user_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to recalculate stats")
 
 
 @router.get("/users", response_class=HTMLResponse)
@@ -209,6 +264,7 @@ async def admin_users(request: Request, db: Session = Depends(get_db)):
     # Get current parent for user banner
     current_parent = db.query(Parent).filter(Parent.id == user_id).first()
     
+    logger.info(f"Admin {user_id} accessed user management page")
     return templates.TemplateResponse("parent/admin_users.html", {
         "request": request,
         "children": children,

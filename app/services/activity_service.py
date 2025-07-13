@@ -55,6 +55,7 @@ class ActivityService:
             logger.info("Generating prompt from template")
             prompt = self.template_service.populate_template(variables)
             logger.info(f"Generated prompt length: {len(prompt)}")
+            logger.info(f"Full generated prompt:\n{prompt}")
             
             # Generate activity with retry
             logger.info("Calling anthropic service")

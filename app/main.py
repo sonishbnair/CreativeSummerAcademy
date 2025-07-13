@@ -1,3 +1,8 @@
+import os
+import logging
+from logging.handlers import TimedRotatingFileHandler
+from datetime import datetime
+
 from fastapi import FastAPI, Request, Depends, HTTPException, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -7,7 +12,41 @@ from app.database import get_db, create_tables
 from app.config import settings
 from app.routers import auth, activities, scoring, dashboard, admin
 from starlette.middleware.sessions import SessionMiddleware
-import os
+
+# --- Logging Setup ---
+LOG_DIR = "logs"
+os.makedirs(LOG_DIR, exist_ok=True)
+log_filename = os.path.join(LOG_DIR, f"app_{datetime.now().strftime('%Y-%m-%d')}.log")
+
+log_level = getattr(logging, settings.log_level.upper(), logging.INFO)
+
+# Remove all handlers from root logger
+for handler in logging.root.handlers[:]:
+    logging.root.removeHandler(handler)
+
+# Set up file handler for app logs only
+file_handler = TimedRotatingFileHandler(log_filename, when="midnight", backupCount=7, encoding="utf-8")
+file_handler.setLevel(log_level)
+file_handler.setFormatter(logging.Formatter(
+    "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+))
+
+# Get app logger and configure
+app_logger = logging.getLogger("app")
+app_logger.setLevel(log_level)
+app_logger.handlers = [file_handler]
+app_logger.propagate = False
+
+# Optionally, set all app sub-loggers to use the same handler
+for name in logging.root.manager.loggerDict:
+    if name.startswith("app."):
+        logger = logging.getLogger(name)
+        logger.setLevel(log_level)
+        logger.handlers = [file_handler]
+        logger.propagate = False
+
+# --- End Logging Setup ---
 
 # Create FastAPI app
 app = FastAPI(

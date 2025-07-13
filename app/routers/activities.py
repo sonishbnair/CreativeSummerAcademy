@@ -18,6 +18,7 @@ import json
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+logger = logging.getLogger('app.routers.activities')
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -33,6 +34,8 @@ async def activity_setup_page(request: Request, db: Session = Depends(get_db)):
     if not user_id:
         return RedirectResponse(url="/auth/login", status_code=302)
     
+    logger.info(f"User {user_id} accessed activity setup page")
+
     # Stats for banner
     daily_stats = scoring_service.get_daily_stats(db, user_id)
     total_activities = db.query(ActivitySession).filter(ActivitySession.user_id == user_id, ActivitySession.status == "scored").count()
@@ -96,7 +99,7 @@ async def generate_activity(
         logger.error("No user_id in session")
         return RedirectResponse(url="/auth/login", status_code=302)
     
-    logger.info(f"Generating activity for user {user_id}: duration={duration}, materials={materials}, objectives={objectives}, category={category}")
+    logger.info(f"User {user_id} requested to generate a new activity: duration={duration}, materials={materials}, objectives={objectives}, category={category}")
     
     # Validate inputs
     if duration < settings.min_activity_duration or duration > settings.max_activity_duration:
@@ -128,7 +131,7 @@ async def generate_activity(
         return RedirectResponse(url=f"/activities/{result['session_id']}/review", status_code=302)
         
     except Exception as e:
-        logger.error(f"Unexpected error in generate_activity: {str(e)}", exc_info=True)
+        logger.error(f"Error generating activity for user {user_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
@@ -222,6 +225,8 @@ async def start_activity(
     if not user_id:
         return RedirectResponse(url="/auth/login", status_code=302)
     
+    logger.info(f"User {user_id} started activity session {session_id}")
+
     session = activity_service.get_activity_session(db, session_id)
     if not session or session.user_id != user_id:
         raise HTTPException(status_code=404, detail="Activity not found")
@@ -296,6 +301,8 @@ async def complete_activity(
     if not user_id:
         return RedirectResponse(url="/auth/login", status_code=302)
     
+    logger.info(f"User {user_id} completed activity session {session_id} with actual_duration={actual_duration}")
+
     session = activity_service.get_activity_session(db, session_id)
     if not session or session.user_id != user_id:
         raise HTTPException(status_code=404, detail="Activity not found")

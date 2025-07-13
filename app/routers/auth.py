@@ -9,6 +9,8 @@ from app.config import settings
 from fastapi.templating import Jinja2Templates
 import bcrypt
 import secrets
+import logging
+logger = logging.getLogger('app.routers.auth')
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -40,6 +42,7 @@ async def login(
     db: Session = Depends(get_db)
 ):
     """Handle login for both children and parents"""
+    logger.info(f"Login attempt: username={username}, user_type={user_type}")
     if user_type == "child":
         # Simple child login - just create/get user
         user = db.query(User).filter(User.name == username).first()
@@ -52,20 +55,24 @@ async def login(
         # Set session
         request.session["user_id"] = user.id
         request.session["user_type"] = "child"
+        logger.info(f"Child login successful: user_id={user.id}, username={username}")
         return RedirectResponse(url="/dashboard/child", status_code=302)
     
     elif user_type == "parent":
         # Parent login with password verification
         parent = db.query(Parent).filter(Parent.name == username).first()
         if not parent:
+            logger.warning(f"Parent login failed: username={username}")
             return RedirectResponse(url="/auth/login?error=Invalid+parent+name+or+password", status_code=302)
         
         if not scoring_service.verify_parent_password(db, parent.id, password):
+            logger.warning(f"Parent login failed (bad password): username={username}")
             return RedirectResponse(url="/auth/login?error=Invalid+parent+name+or+password", status_code=302)
         
         # Set session
         request.session["user_id"] = parent.id
         request.session["user_type"] = "parent"
+        logger.info(f"Parent login successful: parent_id={parent.id}, username={username}")
         return RedirectResponse(url="/dashboard/parent", status_code=302)
     
     return RedirectResponse(url="/auth/login?error=Invalid+user+type", status_code=302)
@@ -74,6 +81,8 @@ async def login(
 @router.get("/logout")
 async def logout(request: Request):
     """Logout user"""
+    user_id = request.session.get("user_id")
+    logger.info(f"User {user_id} logged out")
     request.session.clear()
     return RedirectResponse(url="/auth/login", status_code=302)
 
@@ -109,6 +118,7 @@ async def setup(
     db: Session = Depends(get_db)
 ):
     """Initial setup - create accounts based on setup type"""
+    logger.info(f"Setup attempt: setup_type={setup_type}")
     
     if setup_type == "parent":
         # Parent registration

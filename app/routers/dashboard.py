@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger('app.routers.dashboard')
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
@@ -25,6 +27,7 @@ config_service = ConfigService()
 async def child_dashboard(request: Request, db: Session = Depends(get_db)):
     """Child dashboard"""
     user_id = request.session.get("user_id")
+    logger.info(f"User {user_id} accessed child dashboard")
     if not user_id:
         return RedirectResponse(url="/auth/login", status_code=302)
     
@@ -80,6 +83,7 @@ async def parent_dashboard(request: Request, db: Session = Depends(get_db)):
     """Parent dashboard"""
     user_id = request.session.get("user_id")
     user_type = request.session.get("user_type")
+    logger.info(f"Parent {user_id} accessed parent dashboard (type: {user_type})")
     
     if not user_id or user_type != "parent":
         return RedirectResponse(url="/auth/login", status_code=302)

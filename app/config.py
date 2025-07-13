@@ -51,6 +51,9 @@ class Settings(BaseSettings):
         "building", "painting", "crafting", "jewelry_making", "mixed_media"
     ]
     
+    # Logging Configuration
+    log_level: str = "INFO"
+    
     class Config:
         env_file = ".env"
         case_sensitive = False
