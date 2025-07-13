@@ -29,9 +29,14 @@ async def admin_config(request: Request, db: Session = Depends(get_db)):
     
     config = config_service.get_full_config(db)
     
+    # Get current parent for user banner
+    from app.models.parent import Parent
+    current_parent = db.query(Parent).filter(Parent.id == user_id).first()
+    
     return templates.TemplateResponse("parent/config.html", {
         "request": request,
-        "config": config
+        "config": config,
+        "current_parent": current_parent
     })
 
 
@@ -84,9 +89,13 @@ async def admin_reports(request: Request, db: Session = Depends(get_db)):
             "stats": stats or {"activities_completed": 0, "total_points": 0, "total_time_minutes": 0}
         })
     
+    # Get current parent for user banner
+    current_parent = db.query(Parent).filter(Parent.id == user_id).first()
+    
     return templates.TemplateResponse("parent/reports.html", {
         "request": request,
-        "user_stats": user_stats
+        "user_stats": user_stats,
+        "current_parent": current_parent
     })
 
 
@@ -127,9 +136,14 @@ async def admin_activities(request: Request, db: Session = Depends(get_db)):
             activity.scored_at = None
             activity.scored_by = None
     
+    # Get current parent for user banner
+    from app.models.parent import Parent
+    current_parent = db.query(Parent).filter(Parent.id == user_id).first()
+    
     return templates.TemplateResponse("parent/activities.html", {
         "request": request,
-        "activities": activities
+        "activities": activities,
+        "current_parent": current_parent
     })
 
 
@@ -192,10 +206,14 @@ async def admin_users(request: Request, db: Session = Depends(get_db)):
     children = db.query(User).order_by(User.name).all()
     parents = db.query(Parent).order_by(Parent.name).all()
     
+    # Get current parent for user banner
+    current_parent = db.query(Parent).filter(Parent.id == user_id).first()
+    
     return templates.TemplateResponse("parent/admin_users.html", {
         "request": request,
         "children": children,
-        "parents": parents
+        "parents": parents,
+        "current_parent": current_parent
     })
 
 

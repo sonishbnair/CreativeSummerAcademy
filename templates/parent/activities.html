@@ -3,6 +3,20 @@
 {% block title %}Activity Management - Sreya's Creative Summer Academy{% endblock %}
 
 {% block content %}
+<!-- User Banner -->
+<div class="user-banner">
+    <div class="user-info">
+        <span class="user-icon">👤</span>
+        <span class="user-name">{{ current_parent.name }}</span>
+        {% if current_parent.name == "admin" %}
+        <span class="admin-badge">👑 Admin</span>
+        {% endif %}
+    </div>
+    <div class="user-actions">
+        <a href="/auth/logout" class="btn btn-sm btn-outline">Logout</a>
+    </div>
+</div>
+
 <div class="card">
     <div class="admin-header">
         <h2>🎯 Activity Management</h2>
@@ -215,6 +229,79 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+}
+
+.user-banner {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
+    color: white;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-icon {
+    font-size: 1.2em;
+}
+
+.user-name {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.admin-badge {
+    background: #ffc107;
+    color: #856404;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.user-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.875em;
+}
+
+.btn-outline {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+    background: white;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+@media (max-width: 768px) {
+    .user-banner {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .user-info {
+        justify-content: center;
     }
 }
 </style>
