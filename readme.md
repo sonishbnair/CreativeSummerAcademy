@@ -13,25 +13,31 @@ A gamified web application designed to keep kids active and engaged during summe
 
 ### Child Experience
 
-#### 1. Activity Timer & Steps
+#### 1. Rules & How to Play
+<img src="screenshots/child_rules.png" alt="Rules and How to Play" width="600"/>
+
+*The rules page explains how to play, important rules, the points system, activity categories, and learning objectives in a kid-friendly way.*
+
+#### 2. Create Activity Page
+<img src="screenshots/Create_activity.png" alt="Rules and How to Play" width="600"/>
+
+*The create activity page for child, child can select the max duration of the acticity, acivity type, regular household items to use in the activity etc to create an activity*
+
+#### 3. Activity Timer & Steps
 <img src="screenshots/child_activity_timer.png" alt="Child Activity Timer and Steps" width="600"/>
 
 *The child sees a real-time countdown, step-by-step instructions, and encouragement from Minnal Ammu during an activity.*
 
-#### 2. Activity Limit Reached
+#### 4. Activity Limit Reached
 <img src="screenshots/child_activity_limit.png" alt="Activity Limit Reached" width="600"/>
 
 *If the child tries to start a new activity before finishing or scoring the current one, a friendly message explains the reason and shows their daily activity count.*
 
-#### 3. Child Dashboard & Recent Activities
+#### 5. Child Dashboard & Recent Activities
 <img src="screenshots/child_dashboard.png" alt="Child Dashboard and Recent Activities" width="600"/>
 
 *The child dashboard welcomes the user, shows any active activity, and lists recent activities with their status.*
 
-#### 4. Rules & How to Play
-<img src="screenshots/child_rules.png" alt="Rules and How to Play" width="600"/>
-
-*The rules page explains how to play, important rules, the points system, activity categories, and learning objectives in a kid-friendly way.*
 
 ## 🎮 Game Concept: "Creative Summer Academy"
 

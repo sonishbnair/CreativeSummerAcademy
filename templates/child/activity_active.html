@@ -20,6 +20,23 @@
         <div class="progress-bar">
             <div class="progress-fill" style="width: 0%"></div>
         </div>
+        
+        <!-- Extension button that appears automatically when timer hits 00:00 -->
+        <div id="extension-section" style="display: none;" class="extension-section">
+            <div class="extension-message">
+                <h4>⏰ Time's Up!</h4>
+                <p>Great job! You can extend your time or finish your activity.</p>
+            </div>
+            <div class="extension-actions">
+                <button id="extension-button" class="btn btn-warning btn-lg" style="margin-right: 16px;">
+                    ⏰ Extend (+5 min) - {{ session.extensions_used }}/2 used
+                </button>
+                <form method="POST" action="/activities/{{ session.id }}/complete" style="display: inline; margin: 0;">
+                    <input type="hidden" name="actual_duration" id="actual-duration" value="{{ session.selected_duration }}">
+                    <button type="submit" class="btn btn-success btn-lg">🎉 I'm Done!</button>
+                </form>
+            </div>
+        </div>
     </div>
     
     {% if activity and activity.steps %}
@@ -37,24 +54,6 @@
         <p>No steps found for this activity. Try refreshing or starting a new activity!</p>
     </div>
     {% endif %}
-    
-    <div class="activity-controls">
-        {% if can_extend %}
-        <button id="extend-button" class="btn btn-warning">
-            ⏰ Extend (+5 min) - {{ session.extensions_used }}/2 used
-        </button>
-        {% endif %}
-        
-        <form method="POST" action="/activities/{{ session.id }}/complete" style="display: inline;">
-            <input type="hidden" name="actual_duration" id="actual-duration" value="{{ session.selected_duration }}">
-            <button type="submit" class="btn btn-success">🎉 I'm Done!</button>
-        </form>
-    </div>
-    
-    <div id="timer-complete" style="display: none;" class="alert alert-warning">
-        <h3>⏰ Time's Up!</h3>
-        <p>Great job! You can extend your time or finish your activity.</p>
-    </div>
     
     <div class="encouragement">
         <h4>💫 Minnal Ammu says:</h4>
@@ -89,6 +88,51 @@
     color: var(--primary-color);
     margin: 20px 0;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #e9ecef;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 20px 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), #0056b3);
+    transition: width 0.3s ease;
+}
+
+.extension-section {
+    margin: 20px 0;
+    padding: 20px;
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.extension-message {
+    margin-bottom: 15px;
+}
+
+.extension-message h4 {
+    color: #856404;
+    margin-bottom: 10px;
+}
+
+.extension-message p {
+    color: #856404;
+    font-size: 1.1em;
+}
+
+.extension-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
 }
 
 .activity-steps {
@@ -146,123 +190,191 @@
 </style>
 
 <script>
-// Client-side timer calculation using database start_time
-const timerElem = document.getElementById('timer');
-const startTimeRaw = "{{ session.start_time.strftime('%Y-%m-%dT%H:%M:%SZ') if session.start_time else '' }}";
-const startTime = new Date(startTimeRaw);
-const duration = {{ session.selected_duration }} * 60; // Convert to seconds
-const extensions = {{ session.extensions_used }} * 5 * 60; // Extension time in seconds
-const totalTime = duration + extensions;
-
-let currentDuration = totalTime;
-let extensionsUsed = {{ session.extensions_used }};
-
-// Debug logging
-console.log('Timer Debug:', {
-    startTimeRaw: startTimeRaw,
-    startTime: startTime,
-    startTimeValid: !isNaN(startTime.getTime()),
-    duration: duration,
-    extensions: extensions,
-    totalTime: totalTime,
-    now: new Date()
-});
-
-function updateTimer() {
-    const now = new Date();
-    
-    // Check if startTime is valid
-    if (isNaN(startTime.getTime()) || !startTimeRaw) {
-        console.error('Invalid start time:', startTimeRaw);
-        // Show original duration as fallback
-        const fallbackMinutes = {{ session.selected_duration }};
-        timerElem.textContent = `${fallbackMinutes}:00`;
-        return;
+// Hybrid Approach Timer Implementation
+class HybridTimer {
+    constructor(sessionId, startTimeRaw, selectedDuration, extensionsUsed) {
+        this.sessionId = sessionId;
+        this.startTime = new Date(startTimeRaw);
+        this.selectedDuration = selectedDuration;
+        this.extensionsUsed = extensionsUsed;
+        this.currentDuration = selectedDuration * 60; // Convert to seconds
+        this.extensionTime = 5 * 60; // 5 minutes in seconds
+        this.maxExtensions = 2;
+        
+        // DOM elements
+        this.timerElem = document.getElementById('timer');
+        this.progressFill = document.querySelector('.progress-fill');
+        this.extensionSection = document.getElementById('extension-section');
+        this.extensionButton = document.getElementById('extension-button');
+        
+        // State
+        this.isRunning = true;
+        this.hasReachedZero = false;
+        this.interval = null;
+        
+        // Initialize
+        this.initializeEventListeners();
+        this.start();
     }
     
-    const elapsed = Math.floor((now - startTime) / 1000);
-    const remaining = Math.max(0, currentDuration - elapsed);
-    
-    // Debug logging
-    console.log('Timer Update:', {
-        now: now,
-        startTime: startTime,
-        elapsed: elapsed,
-        elapsedMinutes: Math.floor(elapsed / 60),
-        currentDuration: currentDuration,
-        remaining: remaining,
-        minutes: Math.floor(remaining / 60),
-        seconds: remaining % 60
-    });
-    
-    // Update timer display
-    const minutes = Math.floor(remaining / 60);
-    const seconds = remaining % 60;
-    timerElem.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    
-    // Update progress bar
-    const progress = Math.min(100, (elapsed / currentDuration) * 100);
-    document.querySelector('.progress-fill').style.width = `${progress}%`;
-    
-    if (remaining > 0) {
-        setTimeout(updateTimer, 1000);
-    } else {
-        document.getElementById('timer-complete').style.display = 'block';
+    initializeEventListeners() {
+        // Extension button click handler
+        if (this.extensionButton) {
+            this.extensionButton.addEventListener('click', () => {
+                this.requestExtension();
+            });
+        }
     }
-}
-
-// Start timer
-updateTimer();
-
-// Handle extend button
-const extendButton = document.getElementById('extend-button');
-if (extendButton) {
-    extendButton.addEventListener('click', () => {
-        fetch(`/activities/{{ session.id }}/extend`, {
-            method: 'POST'
-        }).then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                currentDuration += 5 * 60; // Add 5 minutes
-                extensionsUsed = data.extensions_used;
-                extendButton.textContent = `Extend (+5 min) - ${extensionsUsed}/2 used`;
-                if (extensionsUsed >= 2) {
-                    extendButton.disabled = true;
-                }
-            }
-        });
-    });
-}
-
-// Update actual duration when form is submitted
-const form = document.querySelector('form');
-if (form) {
-    form.addEventListener('submit', function() {
+    
+    start() {
+        this.updateTimer();
+        this.interval = setInterval(() => {
+            this.updateTimer();
+        }, 1000);
+    }
+    
+    updateTimer() {
         const now = new Date();
-        const selectedDuration = {{ session.selected_duration }};
         
-        // Validate startTime before calculation
-        if (isNaN(startTime.getTime()) || !startTimeRaw) {
-            console.error('Invalid start time for actual_duration calculation:', startTimeRaw);
-            // Use selected_duration as fallback
-            document.getElementById('actual-duration').value = selectedDuration;
+        // Check if startTime is valid
+        if (isNaN(this.startTime.getTime())) {
+            console.error('Invalid start time');
+            this.timerElem.textContent = `${this.selectedDuration}:00`;
             return;
         }
         
-        const elapsedMinutes = Math.floor((now - startTime) / (1000 * 60));
+        const elapsed = Math.floor((now - this.startTime) / 1000);
+        const remaining = Math.max(0, this.currentDuration - elapsed);
         
-        // Ensure we have a valid number
-        if (isNaN(elapsedMinutes) || elapsedMinutes < 0) {
-            console.error('Invalid elapsed time calculation:', elapsedMinutes);
-            document.getElementById('actual-duration').value = selectedDuration;
+        // Update timer display
+        const minutes = Math.floor(remaining / 60);
+        const seconds = remaining % 60;
+        this.timerElem.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        // Update progress bar
+        const progress = Math.min(100, (elapsed / this.currentDuration) * 100);
+        this.progressFill.style.width = `${progress}%`;
+        
+        // Check if timer has reached zero
+        if (remaining <= 0 && !this.hasReachedZero) {
+            this.hasReachedZero = true;
+            this.handleTimerComplete();
+        }
+    }
+    
+    handleTimerComplete() {
+        // Show extension section if extensions are available
+        if (this.extensionsUsed < this.maxExtensions) {
+            this.extensionSection.style.display = 'block';
+            this.updateExtensionButton();
+        }
+    }
+    
+    updateExtensionButton() {
+        if (this.extensionButton) {
+            this.extensionButton.textContent = `⏰ Extend (+5 min) - ${this.extensionsUsed}/${this.maxExtensions} used`;
+            if (this.extensionsUsed >= this.maxExtensions) {
+                this.extensionButton.disabled = true;
+                this.extensionButton.textContent = 'Maximum extensions reached';
+            }
+        }
+    }
+    
+    async requestExtension() {
+        if (this.extensionsUsed >= this.maxExtensions) {
             return;
         }
         
-        console.log('Setting actual_duration to:', elapsedMinutes);
-        document.getElementById('actual-duration').value = elapsedMinutes;
-    });
+        try {
+            // Disable button during request
+            this.extensionButton.disabled = true;
+            this.extensionButton.textContent = 'Requesting extension...';
+            
+            const response = await fetch(`/activities/${this.sessionId}/extend`, {
+                method: 'POST'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update local state
+                this.extensionsUsed = data.extensions_used;
+                this.currentDuration += this.extensionTime;
+                this.hasReachedZero = false;
+                
+                // Hide extension section
+                this.extensionSection.style.display = 'none';
+                
+                // Update button
+                this.updateExtensionButton();
+                
+                // Continue timer
+                this.start();
+                
+                console.log('Extension granted:', data);
+            } else {
+                console.error('Extension failed:', data.error);
+                alert('Failed to extend activity: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error requesting extension:', error);
+            alert('Error requesting extension. Please try again.');
+        } finally {
+            // Re-enable button if extension failed
+            if (this.extensionsUsed < this.maxExtensions) {
+                this.extensionButton.disabled = false;
+                this.updateExtensionButton();
+            }
+        }
+    }
+    
+    stop() {
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = null;
+        }
+        this.isRunning = false;
+    }
 }
+
+// Initialize timer when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const sessionId = {{ session.id }};
+    const startTimeRaw = "{{ session.start_time.strftime('%Y-%m-%dT%H:%M:%SZ') if session.start_time else '' }}";
+    const selectedDuration = {{ session.selected_duration }};
+    const extensionsUsed = {{ session.extensions_used }};
+    
+    // Initialize hybrid timer
+    const timer = new HybridTimer(sessionId, startTimeRaw, selectedDuration, extensionsUsed);
+    
+    // Update actual duration when form is submitted
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const now = new Date();
+            const startTime = new Date(startTimeRaw);
+            
+            if (isNaN(startTime.getTime()) || !startTimeRaw) {
+                console.error('Invalid start time for actual_duration calculation:', startTimeRaw);
+                document.getElementById('actual-duration').value = selectedDuration;
+                return;
+            }
+            
+            const elapsedMinutes = Math.floor((now - startTime) / (1000 * 60));
+            
+            if (isNaN(elapsedMinutes) || elapsedMinutes < 0) {
+                console.error('Invalid elapsed time calculation:', elapsedMinutes);
+                document.getElementById('actual-duration').value = selectedDuration;
+                return;
+            }
+            
+            console.log('Setting actual_duration to:', elapsedMinutes);
+            document.getElementById('actual-duration').value = elapsedMinutes;
+        });
+    }
+});
 </script>
+
 {# Debug block for troubleshooting #}
 {% if activity %}
 <details style="margin-top: 2em;">

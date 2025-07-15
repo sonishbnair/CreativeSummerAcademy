@@ -286,6 +286,10 @@ async def extend_activity(
     if not result["success"]:
         raise HTTPException(status_code=400, detail=result["error"])
     
+    # Add new timer duration to response for frontend
+    result["new_timer_duration"] = 5 * 60  # 5 minutes in seconds
+    result["extension_time"] = 5  # 5 minutes
+    
     return JSONResponse(content=result)
 
 

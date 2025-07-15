@@ -20,9 +20,9 @@ class Settings(BaseSettings):
     
     # Activity Configuration
     max_activities_per_day: int = 3
-    min_activity_duration: int = 10
-    max_activity_duration: int = 30
-    duration_increment: int = 5
+    min_activity_duration: int = 1 
+    max_activity_duration: int = 2 
+    duration_increment: int = 1  
     extension_penalty: int = 5
     max_extensions_per_activity: int = 2
     regenerate_cooldown_minutes: int = 15
