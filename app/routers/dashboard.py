@@ -74,7 +74,8 @@ async def child_dashboard(request: Request, db: Session = Depends(get_db)):
         "recent_activities": recent_activities,
         "can_start_new": can_start_new,
         "total_activities": total_activities,
-        "total_points": total_points
+        "total_points": total_points,
+        "child_name": user.name
     })
 
 

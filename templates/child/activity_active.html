@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Active Activity - Sreya's Galactic Academy{% endblock %}
+{% block title %}Active Activity - Creative Summer Academy{% endblock %}
 
 {% block content %}
 <div class="card">
-    <h2>🌟 Sreya's Adventure with Minnal Ammu 🌟</h2>
+    <h2>🌟 {{ child_name }}'s Adventure 🌟</h2>
     
     <div class="activity-header">
         <h3>{{ activity.title if activity and activity.title else 'Your Space Adventure' }}</h3>
@@ -56,8 +56,8 @@
     {% endif %}
     
     <div class="encouragement">
-        <h4>💫 Minnal Ammu says:</h4>
-        <p>"You're doing amazing, Sreya! Keep creating and having fun!"</p>
+        <h4>💫 Keep Going, {{ child_name }}!</h4>
+        <p>"You're doing amazing! Keep creating and having fun!"</p>
     </div>
     
     <div style="text-align: center; margin-top: 30px;">

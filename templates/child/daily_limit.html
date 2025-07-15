@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="card" style="text-align: center; margin-top: 40px;">
-    <h2>🚦 Whoa, Space Explorer!</h2>
+    <h2>🚦 Whoa, {{ child_name }}!</h2>
     <p>
         You can't start a new activity right now.<br>
         {% if session and session.status in ['active', 'completed'] %}

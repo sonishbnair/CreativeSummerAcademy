@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Review Activity - Sreya's Galactic Academy{% endblock %}
+{% block title %}Review Activity - Creative Summer Academy{% endblock %}
 
 {% block content %}
 <div class="card">
-    <h2>🌟 Your Adventure with Minnal Ammu is Ready! 🌟</h2>
+    <h2>🌟 Your Adventure is Ready! 🌟</h2>
     <!-- Summer Charger Points banner moved below -->
     
     <div class="activity-details">
@@ -78,7 +78,7 @@
     
     <div style="text-align: center; margin: 30px 0;">
         <form method="POST" action="/activities/{{ session.id }}/start" style="display: inline;">
-            <button type="submit" class="btn btn-primary btn-lg">🚀 Start My Adventure with Minnal Ammu! 🚀</button>
+            <button type="submit" class="btn btn-primary btn-lg">Start My Activities</button>
         </form>
         
         <a href="/activities/setup" class="btn btn-secondary">🔄 Create Different Activity</a>

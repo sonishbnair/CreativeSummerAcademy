@@ -608,8 +608,6 @@ MAX_ACTIVITY_DURATION=30
 - [ ] Session recovery and progress tracking
 - [ ] Basic admin configuration interface
 - [ ] Rules pages for children and parents
-- [ ] **Local testing complete on macOS with SQLite**
-- [ ] **MVP deployment to Render after local success**
 
 ### Phase 2 (Enhanced)
 - [ ] Advanced progress visualization and academy campus
