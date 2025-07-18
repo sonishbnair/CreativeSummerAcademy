@@ -21,6 +21,13 @@
             <div class="progress-fill" style="width: 0%"></div>
         </div>
         
+        <!-- Always show the 'I'm Done' button below the timer -->
+        <div class="activity-done-section" style="margin: 20px 0; text-align: center;">
+            <form method="POST" action="/activities/{{ session.id }}/complete" style="display: inline; margin: 0;">
+                <input type="hidden" name="actual_duration" id="actual-duration" value="{{ session.selected_duration }}">
+                <button type="submit" class="btn btn-success btn-lg">🎉 I'm Done!</button>
+            </form>
+        </div>
         <!-- Extension button that appears automatically when timer hits 00:00 -->
         <div id="extension-section" style="display: none;" class="extension-section">
             <div class="extension-message">
@@ -31,10 +38,6 @@
                 <button id="extension-button" class="btn btn-warning btn-lg" style="margin-right: 16px;">
                     ⏰ Extend (+5 min) - {{ session.extensions_used }}/2 used
                 </button>
-                <form method="POST" action="/activities/{{ session.id }}/complete" style="display: inline; margin: 0;">
-                    <input type="hidden" name="actual_duration" id="actual-duration" value="{{ session.selected_duration }}">
-                    <button type="submit" class="btn btn-success btn-lg">🎉 I'm Done!</button>
-                </form>
             </div>
         </div>
     </div>

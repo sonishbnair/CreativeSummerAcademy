@@ -252,6 +252,11 @@ async def active_activity(
     if not session or session.user_id != user_id:
         raise HTTPException(status_code=404, detail="Activity not found")
     
+    # Ensure the session is started and start_time is set
+    if not session.start_time:
+        activity_service.start_activity(db, session_id)
+        session = activity_service.get_activity_session(db, session_id)
+    
     can_extend = session_service.can_extend_activity(session)
     
     daily_stats = scoring_service.get_daily_stats(db, user_id)

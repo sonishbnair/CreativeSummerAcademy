@@ -1,0 +1,23 @@
+{
+  "building": [
+    "cardboard", "scissors", "glue", "tape", "popsicle_sticks", 
+    "cardboard_tubes", "wooden_craft_sticks", "small_boxes", 
+    "rubber_bands", "string", "markers"
+  ],
+  "painting": [
+    "paints", "brushes", "paper", "construction_paper", 
+    "markers", "paper_plates", "cups", "paper_towels", 
+    "aluminum_foil", "sponges"
+  ],
+  "crafting": [
+    "cardboard", "scissors", "markers", "glue", "string", 
+    "beads", "paints", "paper", "tape", "construction_paper", 
+    "pipe_cleaners", "googly_eyes", "cotton_balls", 
+    "tissue_paper", "aluminum_foil"
+  ],
+  "jewelry_making": [
+    "beads", "string", "yarn", "buttons", "pipe_cleaners", 
+    "scissors", "elastic_cord", "safety_pins", "ribbon", 
+    "wooden_beads", "plastic_beads"
+  ]
+} 
