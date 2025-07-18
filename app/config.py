@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     
     # Activity categories
     categories: List[str] = [
-        "building", "painting", "crafting", "jewelry_making", "mixed_media"
+        "building", "painting", "crafting", "jewelry_making"
     ]
     
     # Logging Configuration
