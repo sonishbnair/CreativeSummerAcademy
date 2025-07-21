@@ -39,6 +39,39 @@ A gamified web application designed to keep kids active and engaged during summe
 *The child dashboard welcomes the user, shows any active activity, and lists recent activities with their status.*
 
 
+### High-level Architecture Diagram
+<img src="screenshots/child_architecture_diagram.png" alt="High-level Architecture Diagram" width="600"/>
+```mermaid
+flowchart TD
+    subgraph Browser
+        UI[Child/Parent UI (Jinja2 Templates)]
+        Static[Static Assets (CSS/JS)]
+    end
+
+    subgraph FastAPI_Backend
+        Routers[FastAPI Routers (activities, auth, admin, etc.)]
+        Services[Service Layer (activity_service, scoring_service, etc.)]
+        Models[SQLAlchemy ORM Models]
+        Config[Config & Category Mapping (config.py, category_materials.json)]
+        Anthropic[Anthropic API Integration]
+    end
+
+    subgraph Database
+        DB[(ActivitySession, User, Parent, DailyStats, etc.)]
+    end
+
+    UI -- HTTP Requests --> Routers
+    Static -- Loads --> UI
+    Routers -- Calls --> Services
+    Services -- Reads/Writes --> Models
+    Services -- Loads --> Config
+    Services -- Uses --> Anthropic
+    Models -- Persists --> DB
+    Routers -- Renders --> UI
+    Routers -- Serves --> Static
+    Anthropic -- External API --> Claude[Anthropic Claude API]
+
+
 ## 🎮 Game Concept: "Creative Summer Academy"
 
 Children attend a prestigious space academy where they learn different crafting skills to become Master Space Explorers. The academy features different space stations:
