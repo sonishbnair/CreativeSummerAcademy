@@ -38,6 +38,10 @@ A gamified web application designed to keep kids active and engaged during summe
 
 *The child dashboard welcomes the user, shows any active activity, and lists recent activities with their status.*
 
+#### 6. Reimburse Summer Charger Points
+<img src="screenshots/Reimburse_Summer_Charger_Points.png.png" alt="Child Dashboard and Recent Activities" width="600"/>
+
+*Children can redeem their accumulated Summer Charger Points for rewards like toys, treats, and special activities, with a weekly limit.*
 
 ### High-level Architecture Diagram
 <img src="screenshots/child_architecture_diagram.png" alt="High-level Architecture Diagram" width="600"/>
