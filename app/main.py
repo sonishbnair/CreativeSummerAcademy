@@ -10,7 +10,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from app.database import get_db, create_tables
 from app.config import settings
-from app.routers import auth, activities, scoring, dashboard, admin
+from app.routers import auth, activities, scoring, dashboard, admin, reimbursement
 from starlette.middleware.sessions import SessionMiddleware
 
 # --- Logging Setup ---
@@ -70,6 +70,7 @@ app.include_router(activities.router, prefix="/activities", tags=["activities"])
 app.include_router(scoring.router, prefix="/scoring", tags=["scoring"])
 app.include_router(dashboard.router, prefix="/dashboard", tags=["dashboard"])
 app.include_router(admin.router, prefix="/admin", tags=["admin"])
+app.include_router(reimbursement.router, prefix="/reimbursement", tags=["reimbursement"])
 
 
 @app.on_event("startup")

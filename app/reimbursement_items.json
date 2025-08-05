@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Ice Cream",
+    "description": "A delicious ice cream treat of your choice",
+    "points_cost": 200,
+    "is_active": true
+  },
+  {
+    "name": "Small Slime",
+    "description": "Fun squishy slime toy in your favorite color",
+    "points_cost": 200,
+    "is_active": true
+  },
+  {
+    "name": "$5 Toy",
+    "description": "Choose any toy worth $5 or less from the store",
+    "points_cost": 700,
+    "is_active": true
+  },
+  {
+    "name": "$10 Toy",
+    "description": "Choose any toy worth $10 or less from the store",
+    "points_cost": 1000,
+    "is_active": true
+  },
+  {
+    "name": "Movie Night",
+    "description": "Pick a movie and have a special movie night with popcorn",
+    "points_cost": 500,
+    "is_active": true
+  },
+  {
+    "name": "Choose Dinner",
+    "description": "Pick what's for dinner tonight",
+    "points_cost": 300,
+    "is_active": true
+  },
+  {
+    "name": "Special Treat",
+    "description": "Any special treat of your choice (candy, cookies, etc.)",
+    "points_cost": 100,
+    "is_active": true
+  }
+] 

@@ -4,6 +4,7 @@ from .template_service import TemplateService
 from .scoring_service import ScoringService
 from .session_service import SessionService
 from .config_service import ConfigService
+from .reimbursement_service import ReimbursementService
 
 __all__ = [
     "ActivityService",
@@ -11,5 +12,6 @@ __all__ = [
     "TemplateService",
     "ScoringService",
     "SessionService",
-    "ConfigService"
+    "ConfigService",
+    "ReimbursementService"
 ] 

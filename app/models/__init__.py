@@ -4,6 +4,7 @@ from .activity import ActivitySession
 from .scoring import ActivityScore
 from .config import SystemConfig
 from .daily_stats import DailyStats
+from .reimbursement import ReimbursementHistory, WeeklyReimbursementStatus, ReimbursementItem, PointDeduction
 
 __all__ = [
     "User",
@@ -11,5 +12,9 @@ __all__ = [
     "ActivitySession",
     "ActivityScore",
     "SystemConfig",
-    "DailyStats"
+    "DailyStats",
+    "ReimbursementHistory",
+    "WeeklyReimbursementStatus",
+    "ReimbursementItem",
+    "PointDeduction"
 ] 

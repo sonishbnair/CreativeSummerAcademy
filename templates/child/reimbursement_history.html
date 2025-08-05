@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Reimbursement History{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center mb-4">📋 My Reimbursement History</h1>
+            
+            <!-- Points Summary -->
+            <div class="alert alert-info text-center mb-4">
+                <h4>💰 Total Points Earned: {{ total_points }} 💰</h4>
+            </div>
+
+            <!-- History Table -->
+            {% if history %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">🎁 Items You've Redeemed</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Points Cost</th>
+                                        <th>Date Redeemed</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for record in history %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ record.item_name }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary">{{ record.points_cost }} Points</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted">
+                                                {{ record.redeemed_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Items Redeemed</h5>
+                                <p class="card-text fs-2">{{ history|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Points Spent</h5>
+                                <p class="card-text fs-2">
+                                    {% set total_spent = history|sum(attribute='points_cost') %}
+                                    {{ total_spent }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title">Points Remaining</h5>
+                                <p class="card-text fs-2">{{ total_points }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            {% else %}
+                <!-- No History -->
+                <div class="text-center">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">No Reimbursements Yet</h5>
+                            <p class="card-text text-muted">
+                                You haven't redeemed any items yet. Start earning points by completing activities!
+                            </p>
+                            <a href="/reimbursement" class="btn btn-primary">
+                                🎁 View Available Items
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Navigation -->
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <a href="/reimbursement" class="btn btn-outline-primary me-2">
+                        🎁 Back to Reimbursement
+                    </a>
+                    <a href="/dashboard/child" class="btn btn-outline-secondary">
+                        ← Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.table th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.card {
+    border: 2px solid #e9ecef;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.fs-2 {
+    font-size: 2rem !important;
+    font-weight: bold;
+    color: #007bff;
+}
+</style>
+{% endblock %} 
